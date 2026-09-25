@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# build / test output
+build/
+coverage/
+*.tsbuildinfo
+
+# generated prisma client
+src/generated/
+
+# env files (keep the documented example)
+.env*
+!.env.example
+
+# vercel
+.vercel/
+
+# logs & OS noise
+npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
+
+# local Claude Code state (keep shared project settings)
+.claude/*
+!.claude/settings.json
+!.claude/launch.json
