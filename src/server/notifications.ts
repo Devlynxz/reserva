@@ -14,6 +14,7 @@ import {
   BookingReminderEmail,
 } from "./email/templates/booking-emails";
 import { type SendResult, sendEmail } from "./email/send";
+import { appUrl } from "./app-url";
 import { env } from "./env";
 import { deriveAccessToken } from "./tokens";
 
@@ -24,8 +25,8 @@ const LOCALE = reservaConfig.locale;
 
 /** Absolute link to the customer's booking page, with its (re-derivable) access token. */
 export function bookingLink(referenceCode: string, bookingId: string): string {
-  const { NEXT_PUBLIC_APP_URL, BETTER_AUTH_SECRET } = env();
-  return `${NEXT_PUBLIC_APP_URL}/book/${referenceCode}?t=${deriveAccessToken(BETTER_AUTH_SECRET, bookingId)}`;
+  const { BETTER_AUTH_SECRET } = env();
+  return `${appUrl()}/book/${referenceCode}?t=${deriveAccessToken(BETTER_AUTH_SECRET, bookingId)}`;
 }
 
 function baseProps(b: BookingEmailRow, settings: BusinessSettings): BookingEmailProps {

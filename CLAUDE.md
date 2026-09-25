@@ -94,7 +94,7 @@ Out of scope for v1: provider refunds, rescheduling, multi-resource bookings, ad
 
 `npm run dev` · `build` · `test` · `typecheck` · `lint` · `db:migrate` · `db:deploy` · `db:seed` (`SEED_PRESET=resort|court|salon`, wipes the DB)
 
-Payments, email and jobs setup (webhook registration, local testing): `docs/PAYMENTS.md`.
+Payments, email and jobs setup (webhook registration, local testing): `docs/PAYMENTS.md`. Deploying (every env var, step-by-step checklist): `docs/DEPLOY.md`; Vercel runs `vercel-build` (migrate deploy on production only).
 
 Sentry: `src/instrumentation*.ts`, off without a DSN; every event goes through `lib/scrub.ts`. `DEMO_MODE=true` adds a banner and one-click owner/staff sign-in and locks settings/team changes — never on a real client's site. `CSP_MODE=report-only` for debugging a deployment's CSP.
 

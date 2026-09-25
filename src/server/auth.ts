@@ -4,6 +4,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "./data/db";
 import { isUserActive } from "./data/users";
+import { trustedOrigins } from "./app-url";
 import { env } from "./env";
 
 // Email/password for ADMIN and STAFF only. Customers never have accounts: they book
@@ -15,6 +16,7 @@ function createAuth() {
     database: prismaAdapter(db, { provider: "postgresql" }),
     secret: BETTER_AUTH_SECRET,
     baseURL: BETTER_AUTH_URL,
+    trustedOrigins: trustedOrigins(),
     emailAndPassword: {
       enabled: true,
       // No public sign-up: users come from the seed or from an ADMIN at /admin/team.

@@ -168,11 +168,15 @@ Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`.
 
 ## Deploying (Vercel)
 
+The full step-by-step checklist — every environment variable, webhooks, Inngest, Blob, a smoke test and go-live — is in **[docs/DEPLOY.md](docs/DEPLOY.md)**. In short:
+
 1. Push to GitHub, then **Vercel → Add New Project** and import the repository.
-2. **Storage → Neon**: sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct) automatically.
-3. Add the remaining variables from `.env.example`: `BETTER_AUTH_SECRET` (`openssl rand -base64 32`), `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL` (the deployment's URL), and whichever optional integrations you use.
-4. Deploy. `npm run build` runs `prisma generate`; apply migrations with `npm run db:deploy` against the direct URL (from your machine, or as a release step).
-5. Optional: **Inngest** and **Vercel Blob** from the Marketplace, a Resend key, a Sentry DSN, and the payment webhooks from [docs/PAYMENTS.md](docs/PAYMENTS.md).
+2. **Storage → Neon**: sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct) automatically. Match the function region to the database region.
+3. Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL` (the `vercel.app` URL, later the custom domain).
+4. Deploy. `npm run vercel-build` generates the Prisma client, applies migrations with `prisma migrate deploy` against the direct URL on production deployments (never on previews unless `MIGRATE_ON_PREVIEW=true`), then builds.
+5. Seed once from your machine, then add payments, Inngest, Blob, Resend and Sentry as needed.
+
+Preview deployments use their own URL for sign-in, email links and checkout returns, so testing a preview never sends anyone to production.
 
 **Demo deployments** set `DEMO_MODE=true`: a banner on every page and "Try it as the owner / as staff" buttons on the sign-in page, with settings and team changes locked. Never enable it on a real client's site — anyone could sign in as the owner.
 

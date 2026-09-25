@@ -2,7 +2,7 @@ import "server-only";
 import { isHoldExpired } from "@/lib/booking-status";
 import { transitionBooking } from "./data/bookings";
 import { attachCheckout, getBookingForCheckout } from "./data/payments";
-import { env } from "./env";
+import { appUrl } from "./app-url";
 import { PaymentProviderError, getCheckoutProvider } from "./payments";
 
 export type CheckoutResult =
@@ -34,7 +34,7 @@ export async function openCheckout(bookingId: string, options: { cancelOnFailure
     if (provider.currencies && !provider.currencies.includes(booking.currency)) {
       throw new PaymentProviderError(`${provider.id} can't charge ${booking.currency}; change the business currency or the provider`);
     }
-    const base = env().NEXT_PUBLIC_APP_URL;
+    const base = appUrl();
     const session = await provider.createCheckout({
       bookingId: booking.id,
       referenceCode: booking.referenceCode,

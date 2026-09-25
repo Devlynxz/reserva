@@ -14,7 +14,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "vercel-build": "node scripts/vercel-build.mjs"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
@@ -22,6 +23,7 @@
     "@prisma/client": "^7.10.0",
     "@react-email/components": "^1.0.12",
     "@sentry/nextjs": "^11.0.0",
+    "@vercel/blob": "^2.8.0",
     "better-auth": "^1.7.6",
     "date-fns": "^4.4.0",
     "decimal.js": "^10.6.0",

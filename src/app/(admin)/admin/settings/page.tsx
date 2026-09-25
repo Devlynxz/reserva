@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { ActionButton } from "@/components/admin/action-button";
 import { ActionForm, AdminCheckboxGroup, AdminField } from "@/components/admin/action-form";
 import { Card, CardBody, CardHeader } from "@/components/ui";
-import { saveSettingsAction } from "@/server/actions/admin/settings";
+import { removeLogoAction, saveSettingsAction, uploadLogoAction } from "@/server/actions/admin/settings";
+import { blobEnabled } from "@/server/blob";
 import { getSettings } from "@/server/data/settings";
 import { env } from "@/server/env";
 import { requireArea } from "@/server/session";
@@ -20,6 +22,35 @@ export default async function SettingsPage() {
         <h1 className="text-2xl font-extrabold">Settings</h1>
         <p className="text-ink-muted">Changes apply to the website right away.</p>
       </div>
+      <Card>
+        <CardHeader title="Logo" description="Shown in the site header instead of the business name. PNG, JPEG or WebP, up to 1 MB." />
+        <CardBody className="space-y-4">
+          {s.logoUrl && (
+            <div className="flex flex-wrap items-center gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size */}
+              <img src={s.logoUrl} alt="Current logo" className="h-12 w-auto rounded border border-line bg-surface p-1" />
+              <ActionButton action={removeLogoAction} label="Remove logo" />
+            </div>
+          )}
+          {blobEnabled() ? (
+            <ActionForm action={uploadLogoAction} submitLabel="Upload logo" submitVariant="secondary" resetOnSuccess>
+              <label className="block space-y-1.5">
+                <span className="text-sm font-semibold">Image file</span>
+                <input
+                  type="file"
+                  name="logo"
+                  accept="image/png,image/jpeg,image/webp"
+                  required
+                  className="block w-full text-sm file:mr-3 file:h-10 file:rounded-control file:border file:border-line-strong file:bg-surface file:px-3 file:font-semibold"
+                />
+              </label>
+            </ActionForm>
+          ) : (
+            <p className="text-sm text-ink-muted">To upload a logo, connect a Vercel Blob store to this project (Storage → Blob). It sets BLOB_READ_WRITE_TOKEN.</p>
+          )}
+        </CardBody>
+      </Card>
+
       <ActionForm action={saveSettingsAction} submitLabel="Save settings">
         <Card>
           <CardHeader title="Business" />

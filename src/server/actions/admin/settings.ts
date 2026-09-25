@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { settingsInputSchema } from "@/lib/validation";
-import { updateSettings } from "../../data/settings";
+import { UploadError, uploadLogo } from "../../blob";
+import { setLogoUrl, updateSettings } from "../../data/settings";
 import { DEMO_LOCKED, isDemo } from "../../demo";
 import { env } from "../../env";
 import { type FormState, formObject, guard, invalid, isSession } from "./form";
@@ -60,4 +61,30 @@ export async function saveSettingsAction(_prev: FormState, formData: FormData): 
   // Name, colors and copy show up everywhere.
   revalidatePath("/", "layout");
   return { ok: true, message: "Settings saved." };
+}
+
+export async function uploadLogoAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  const session = await guard("settings");
+  if (!isSession(session)) return session;
+  if (isDemo()) return { error: DEMO_LOCKED };
+  const file = formData.get("logo");
+  if (!(file instanceof File)) return { error: "Choose an image file.", fieldErrors: { logo: "Choose an image file." } };
+  try {
+    await setLogoUrl(await uploadLogo(file));
+  } catch (error) {
+    if (error instanceof UploadError) return { error: error.message, fieldErrors: { logo: error.message } };
+    console.error("[logo upload]", error);
+    return { error: "The upload failed. Please try again." };
+  }
+  revalidatePath("/", "layout");
+  return { ok: true, message: "Logo updated." };
+}
+
+export async function removeLogoAction(): Promise<FormState> {
+  const session = await guard("settings");
+  if (!isSession(session)) return session;
+  if (isDemo()) return { error: DEMO_LOCKED };
+  await setLogoUrl(null);
+  revalidatePath("/", "layout");
+  return { ok: true };
 }

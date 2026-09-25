@@ -99,3 +99,7 @@ export async function updateSettings(input: SettingsUpdate): Promise<void> {
   };
   await db.settings.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
 }
+
+export async function setLogoUrl(logoUrl: string | null): Promise<void> {
+  await db.settings.update({ where: { id: 1 }, data: { logoUrl } });
+}

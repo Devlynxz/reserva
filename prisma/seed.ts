@@ -405,7 +405,8 @@ async function main() {
 
     const byStatus = await db.booking.groupBy({ by: ["status"], _count: true });
     console.info(`Seeded "${presetName}" — ${settings.businessName}`);
-    console.info(`  ${preset.resources.length} resources, ${preset.offerings.length} offerings, ${created} bookings (${byStatus.map((s) => `${s._count} ${s.status}`).join(", ")})`);
+    const breakdown = byStatus.length ? ` (${byStatus.map((s) => `${s._count} ${s.status}`).join(", ")})` : "";
+    console.info(`  ${preset.resources.length} resources, ${preset.offerings.length} offerings, ${created} bookings${breakdown}`);
     console.info(`  Admin: ${preset.users.admin.email}  Staff: ${preset.users.staff.email}`);
     if (!process.env.SEED_ADMIN_PASSWORD) console.info("  Demo passwords: reserva-admin-demo / reserva-staff-demo");
   } finally {
