@@ -21,6 +21,7 @@ import { type PricingOverride, quote, toPriceBreakdown } from "@/lib/pricing";
 import { generateReferenceCode } from "@/lib/reference-code";
 import { type HoursRow, hoursFor, slotGrid, slotSpan } from "@/lib/slots";
 import { windowSpan } from "@/lib/windows";
+import { deriveAccessToken, hashAccessToken } from "../src/server/tokens";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { court } from "./seeds/court";
 import { resort } from "./seeds/resort";
@@ -338,11 +339,16 @@ async function main() {
       references.add(referenceCode);
 
       const name = preset.customers[created % preset.customers.length]!;
+      const bookingId = randomUUID();
+      const secret = process.env.BETTER_AUTH_SECRET;
       const booking = await db.booking.create({
         data: {
+          id: bookingId,
           referenceCode,
-          // Seeded bookings have no working link; /lookup (reference + email) issues one.
-          accessTokenHash: createHash("sha256").update(randomBytes(32)).digest("hex"),
+          // Same derivation as the app, so reminder emails for seeded bookings carry working links.
+          accessTokenHash: secret
+            ? hashAccessToken(deriveAccessToken(secret, bookingId))
+            : createHash("sha256").update(randomBytes(32)).digest("hex"),
           resourceId,
           offeringId: offering.id,
           startAt: span.startAt,

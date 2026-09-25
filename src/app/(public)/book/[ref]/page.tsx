@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { Badge, type BadgeTone, Button, buttonStyles } from "@/components/ui";
+import { Badge, type BadgeTone, buttonStyles } from "@/components/ui";
 import { formatClock, formatRange } from "@/lib/display";
 import { formatMoney, money } from "@/lib/money";
 import { normalizeReferenceCode } from "@/lib/reference-code";
 import { type CustomerBookingView, findCustomerBooking } from "@/server/data/public";
 import { type BusinessSettings, getSettings } from "@/server/data/settings";
+import { canViewBooking } from "@/server/booking-access";
 import { env } from "@/server/env";
-import { accessTokenMatches, bookingAccessCookieName, verifyBookingAccess } from "@/server/tokens";
 import { reservaConfig } from "@reserva/config";
 import { HoldCountdown } from "./hold-countdown";
+import { PayDepositButton } from "./pay-deposit-button";
 
 export const metadata: Metadata = { title: "Your booking", robots: { index: false, follow: false } };
 
 const LOCALE = reservaConfig.locale;
 
-type Props = { params: Promise<{ ref: string }>; searchParams: Promise<{ t?: string | string[] }> };
+type Props = { params: Promise<{ ref: string }>; searchParams: Promise<{ t?: string | string[]; paid?: string | string[] }> };
 
 /**
  * A customer's booking. Opens with the unguessable link token (?t=) or the signed cookie
@@ -24,22 +24,23 @@ type Props = { params: Promise<{ ref: string }>; searchParams: Promise<{ t?: str
  * used to check whether a reference exists.
  */
 export default async function CustomerBookingPage({ params, searchParams }: Props) {
-  const [{ ref }, { t }] = await Promise.all([params, searchParams]);
+  const [{ ref }, { t, paid }] = await Promise.all([params, searchParams]);
   const reference = normalizeReferenceCode(decodeURIComponent(ref));
   const found = reference ? await findCustomerBooking(reference) : null;
-
   const token = typeof t === "string" ? t : undefined;
-  const cookie = reference ? (await cookies()).get(bookingAccessCookieName(reference))?.value : undefined;
-  const allowed =
-    found !== null &&
-    reference !== null &&
-    ((token !== undefined && accessTokenMatches(token, found.accessTokenHash)) ||
-      verifyBookingAccess(env().BETTER_AUTH_SECRET, reference, cookie));
 
-  if (!allowed || !found) return <NoAccess />;
+  if (!reference || !found || !(await canViewBooking(reference, found.accessTokenHash, token))) return <NoAccess />;
 
   const settings = await getSettings();
-  return <Ticket booking={found.view} settings={settings} paymentsEnabled={env().PAYMENT_PROVIDER !== "none"} />;
+  return (
+    <Ticket
+      booking={found.view}
+      settings={settings}
+      paymentsEnabled={env().PAYMENT_PROVIDER !== "none"}
+      token={token}
+      returnedFromCheckout={paid === "1"}
+    />
+  );
 }
 
 function NoAccess() {
@@ -81,10 +82,14 @@ function Ticket({
   booking,
   settings,
   paymentsEnabled,
+  token,
+  returnedFromCheckout,
 }: {
   booking: CustomerBookingView;
   settings: BusinessSettings;
   paymentsEnabled: boolean;
+  token: string | undefined;
+  returnedFromCheckout: boolean;
 }) {
   const tz = settings.timezone;
   const fmt = (amount: string) => formatMoney(amount, booking.currency, LOCALE);
@@ -138,11 +143,16 @@ function Ticket({
             )}
           </dl>
 
+          {pending && returnedFromCheckout && (
+            <p role="status" className="rounded-control bg-info-soft px-4 py-3 text-sm font-medium text-info">
+              Thanks! We&apos;re confirming your payment with the provider. This page updates by itself.
+            </p>
+          )}
           {pending && (
             <div className="space-y-2">
-              <Button size="lg" className="w-full" disabled={!paymentsEnabled}>
-                Pay {fmt(booking.depositAmount)} deposit
-              </Button>
+              {paymentsEnabled && (
+                <PayDepositButton reference={booking.referenceCode} token={token} label={`Pay ${fmt(booking.depositAmount)} deposit`} />
+              )}
               {!paymentsEnabled && (
                 <p className="text-sm text-ink-muted">
                   Online payment isn&apos;t available yet.{contact ? ` Contact ${settings.businessName} at ${contact} to pay and confirm.` : ""}

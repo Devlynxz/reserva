@@ -126,7 +126,8 @@ export function BookingFlow({
             details={details}
             settings={settings}
             onEdit={goTo}
-            onBooked={(url) => router.push(url)}
+            // Checkout is on the provider's domain; our own pages use client navigation.
+            onBooked={(url) => (url.startsWith("/") ? router.push(url) : window.location.assign(url))}
           />
         )}
       </div>

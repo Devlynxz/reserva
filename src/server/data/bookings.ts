@@ -17,7 +17,9 @@ import { SlotError, isOnGrid, slotSpan } from "@/lib/slots";
 import { modeFieldError } from "@/lib/validation";
 import { WindowError, windowSpan } from "@/lib/windows";
 import type { Prisma } from "@/generated/prisma/client";
-import { generateAccessToken, hashAccessToken } from "../tokens";
+import { randomUUID } from "node:crypto";
+import { env } from "../env";
+import { deriveAccessToken, hashAccessToken } from "../tokens";
 import { type BookableOffering, findBookableOffering, loadHours, loadOverrides } from "./catalog";
 import { db } from "./db";
 import {
@@ -157,7 +159,7 @@ export type BookingSelection = Pick<CreateBookingInput, "offering" | "resourceId
 export type CreatedBooking = {
   id: string;
   referenceCode: string;
-  /** The only time the plain token exists. Put it in the confirmation link; it can't be recovered. */
+  /** For the confirmation link. Re-derivable later from the id (see bookingLink). */
   accessToken: string;
   status: BookingStatus;
   resourceId: string;
@@ -345,10 +347,12 @@ export async function createBooking(input: CreateBookingInput, options: { now?: 
 
         const price = priceFor(resourceId);
         const { status, hasHold } = initialStatus(input.source, { awaitingPayment: input.awaitingPayment });
-        const accessToken = generateAccessToken();
+        const id = randomUUID();
+        const accessToken = deriveAccessToken(env().BETTER_AUTH_SECRET, id);
 
         const booking = await tx.booking.create({
           data: {
+            id,
             referenceCode: generateReferenceCode(),
             accessTokenHash: hashAccessToken(accessToken),
             resourceId,
@@ -405,4 +409,39 @@ export async function createBooking(input: CreateBookingInput, options: { now?: 
       throw error;
     }
   }
+}
+
+// ─── Reactivation check (late payments) ────────────────────────────────────
+
+/**
+ * Could this (EXPIRED) booking take its time back? Locks the resource first, so the answer
+ * holds until the transaction ends; stale holds on the resource are expired so an
+ * abandoned checkout doesn't count against a customer who actually paid.
+ */
+export async function slotStillFree(
+  tx: Tx,
+  booking: { id: string; resourceId: string; startAt: Date; occupiedUntil: Date },
+  now: Date,
+): Promise<boolean> {
+  await lockResources(tx, [booking.resourceId]);
+  await expireStaleHolds(tx, { now, resourceIds: [booking.resourceId] });
+  const [clashes, blocks] = await Promise.all([
+    tx.booking.count({
+      where: {
+        id: { not: booking.id },
+        resourceId: booking.resourceId,
+        status: { in: [...ACTIVE_STATUSES] },
+        startAt: { lt: booking.occupiedUntil },
+        occupiedUntil: { gt: booking.startAt },
+      },
+    }),
+    tx.blockedPeriod.count({
+      where: {
+        OR: [{ resourceId: booking.resourceId }, { resourceId: null }],
+        startAt: { lt: booking.occupiedUntil },
+        endAt: { gt: booking.startAt },
+      },
+    }),
+  ]);
+  return clashes + blocks === 0;
 }

@@ -1,12 +1,15 @@
-import "server-only";
-import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+// Customer access to /book/[ref]. No "server-only" import: pure node:crypto with the
+// secret passed in, so the seed script can use it too. Never import it from client code.
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
-// Access tokens for /book/[ref]?t=… — the reference code is meant to be read aloud, so
-// it can't be what protects a customer's details. Only the SHA-256 of the token is
-// stored; a database leak doesn't leak working links.
+// ─── Link tokens (/book/[ref]?t=…) ──────────────────────────────────────────
+// The reference code is meant to be read aloud, so it can't be what protects a
+// customer's details. The token is derived from the booking id with the server secret:
+// any email (received, confirmed, reminder) can include a working link, while only the
+// token's SHA-256 is stored — a database leak alone doesn't yield working links.
 
-export function generateAccessToken(): string {
-  return randomBytes(32).toString("base64url");
+export function deriveAccessToken(secret: string, bookingId: string): string {
+  return createHmac("sha256", secret).update(`reserva:booking-link:${bookingId}`).digest("base64url");
 }
 
 export function hashAccessToken(token: string): string {
@@ -21,9 +24,9 @@ export function accessTokenMatches(token: string, storedHash: string): boolean {
 }
 
 // ─── Booking access cookie ──────────────────────────────────────────────────
-// After a successful /lookup (reference + email) the customer gets a short-lived,
-// HMAC-signed cookie scoped to /book/<ref>. No token rotation (their emailed link keeps
-// working) and nothing personal ends up in a URL.
+// After a successful /lookup (reference + email), and when a customer is sent to checkout,
+// they get a short-lived HMAC-signed cookie scoped to /book/<ref>. Nothing personal (and
+// no link token) ends up in a URL we hand to a payment provider.
 
 export const BOOKING_ACCESS_TTL_SEC = 60 * 60;
 

@@ -94,4 +94,6 @@ Out of scope for v1: provider refunds, rescheduling, multi-resource bookings, ad
 
 `npm run dev` · `build` · `test` · `typecheck` · `lint` · `db:migrate` · `db:deploy` · `db:seed` (`SEED_PRESET=resort|court|salon`, wipes the DB)
 
+Payments, email and jobs setup (webhook registration, local testing): `docs/PAYMENTS.md`.
+
 DB-backed tests (`src/server/__tests__/db`) run only against `TEST_DATABASE_URL` (truncated freely) and are skipped without it. Prisma 7's `migrate` doesn't regenerate the client: run `db:generate` after schema changes.

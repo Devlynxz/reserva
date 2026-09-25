@@ -93,10 +93,11 @@ export type CustomerBookingView = {
 export async function findCustomerBooking(
   referenceCode: string,
   now = new Date(),
-): Promise<{ accessTokenHash: string; view: CustomerBookingView } | null> {
+): Promise<{ id: string; accessTokenHash: string; view: CustomerBookingView } | null> {
   const b = await db.booking.findUnique({
     where: { referenceCode },
     select: {
+      id: true,
       referenceCode: true,
       accessTokenHash: true,
       status: true,
@@ -118,6 +119,7 @@ export async function findCustomerBooking(
   });
   if (!b) return null;
   return {
+    id: b.id,
     accessTokenHash: b.accessTokenHash,
     view: {
       referenceCode: b.referenceCode,

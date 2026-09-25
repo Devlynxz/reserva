@@ -246,7 +246,7 @@ model Booking {
   startAt       DateTime                  @map("start_at") @db.Timestamptz(6)
   endAt         DateTime                  @map("end_at") @db.Timestamptz(6)
   occupiedUntil DateTime                  @map("occupied_until") @db.Timestamptz(6) // endAt + buffer
-span              Unsupported("tstzrange")? @default(dbgenerated("tstzrange(start_at, occupied_until, '[)'::text)")) // GENERATED [start_at, occupied_until)
+  span          Unsupported("tstzrange")? @default(dbgenerated("tstzrange(start_at, occupied_until, '[)'::text)")) // GENERATED [start_at, occupied_until)
 
   customerName  String  @map("customer_name")
   customerEmail String  @map("customer_email")
@@ -266,6 +266,7 @@ span              Unsupported("tstzrange")? @default(dbgenerated("tstzrange(star
   holdExpiresAt     DateTime?        @map("hold_expires_at") @db.Timestamptz(6)
   paymentProvider   PaymentProvider? @map("payment_provider")
   checkoutSessionId String?          @unique @map("checkout_session_id")
+  checkoutUrl       String?          @map("checkout_url") // reopened by the "Pay deposit" button while the hold lasts
   reminderSentAt    DateTime?        @map("reminder_sent_at") @db.Timestamptz(6)
 
   createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)

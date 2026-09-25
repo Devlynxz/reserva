@@ -88,3 +88,8 @@ export function env(): Env {
   cached ??= parseEnv(process.env);
   return cached;
 }
+
+/** Tests only: forget the parsed env after stubbing variables. */
+export function resetEnvCache(): void {
+  cached = undefined;
+}

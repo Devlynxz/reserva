@@ -1,13 +1,11 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { lookupSchema } from "@/lib/validation";
+import { grantBookingAccess } from "../booking-access";
 import { bookingMatchesEmail } from "../data/public";
-import { env } from "../env";
 import { rateLimit, tooManyRequestsMessage } from "../rate-limit";
 import { clientIp } from "../request";
-import { BOOKING_ACCESS_TTL_SEC, bookingAccessCookieName, signBookingAccess } from "../tokens";
 
 export type LookupState = { error?: string; fieldErrors?: { reference?: string; email?: string } };
 
@@ -40,13 +38,6 @@ export async function lookupAction(_previous: LookupState, formData: FormData): 
 
   if (!(await bookingMatchesEmail(reference, email))) return { error: NOT_FOUND };
 
-  const expiresAt = Date.now() + BOOKING_ACCESS_TTL_SEC * 1000;
-  (await cookies()).set(bookingAccessCookieName(reference), signBookingAccess(env().BETTER_AUTH_SECRET, reference, expiresAt), {
-    httpOnly: true,
-    secure: env().NODE_ENV === "production",
-    sameSite: "lax",
-    path: `/book/${reference}`,
-    maxAge: BOOKING_ACCESS_TTL_SEC,
-  });
+  await grantBookingAccess(reference);
   redirect(`/book/${reference}`);
 }

@@ -1,8 +1,14 @@
 "use server";
 
 import { type MoneyInput, formatMoney, money } from "@/lib/money";
+import { normalizeReferenceCode } from "@/lib/reference-code";
 import { bookingRequestSchema, bookingSelectionSchema } from "@/lib/validation";
+import { afterResponse } from "../after-response";
+import { canViewBooking, grantBookingAccess } from "../booking-access";
+import { openCheckout } from "../checkout";
 import { createBooking, previewBooking } from "../data/bookings";
+import { findCustomerBooking } from "../data/public";
+import { notifyBookingReceived } from "../notifications";
 import { rateLimit, tooManyRequestsMessage } from "../rate-limit";
 import { clientIp } from "../request";
 import { type ActionResult, actionError, invalidInput } from "./result";
@@ -79,9 +85,40 @@ export async function createBookingAction(raw: unknown): Promise<ActionResult<{ 
       customerNotes: notes,
       source: "ONLINE",
     });
-    // Phase 5 sends the customer to the payment provider's checkout from here.
-    return { ok: true, data: { redirectTo: `/book/${booking.referenceCode}?t=${booking.accessToken}` } };
+    await grantBookingAccess(booking.referenceCode);
+    const checkout = await openCheckout(booking.id, { cancelOnFailure: true });
+    if (checkout.status === "failed") return { ok: false, error: checkout.message, code: "checkout_failed" };
+
+    // The "received" email carries the booking link; it goes out after the response.
+    afterResponse(() => notifyBookingReceived(booking.id));
+    return {
+      ok: true,
+      data: {
+        redirectTo: checkout.status === "redirect" ? checkout.url : `/book/${booking.referenceCode}?t=${booking.accessToken}`,
+      },
+    };
   } catch (error) {
     return actionError(error);
+  }
+}
+
+/** "Pay deposit" on the booking page: reopen (or open) checkout for a pending booking. */
+export async function payDepositAction(rawReference: string, token?: string): Promise<ActionResult<{ redirectTo: string }>> {
+  const reference = normalizeReferenceCode(String(rawReference));
+  const found = reference ? await findCustomerBooking(reference) : null;
+  if (!reference || !found || !(await canViewBooking(reference, found.accessTokenHash, token))) {
+    return { ok: false, error: "We can't find that booking. Open it again from your link or Find my booking.", code: "not_found" };
+  }
+  const bookingId = found.id;
+  const checkout = await openCheckout(bookingId);
+  switch (checkout.status) {
+    case "redirect":
+      return { ok: true, data: { redirectTo: checkout.url } };
+    case "payments_off":
+      return { ok: false, error: "Online payment isn't available. Please contact us to pay.", code: "payments_off" };
+    case "not_payable":
+      return { ok: false, error: "This booking can't be paid online anymore. Reload the page to see its status.", code: "not_payable" };
+    case "failed":
+      return { ok: false, error: checkout.message, code: "checkout_failed" };
   }
 }

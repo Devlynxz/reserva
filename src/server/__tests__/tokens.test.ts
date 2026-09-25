@@ -3,7 +3,7 @@ import { clientIpFrom } from "../request";
 import {
   accessTokenMatches,
   bookingAccessCookieName,
-  generateAccessToken,
+  deriveAccessToken,
   hashAccessToken,
   signBookingAccess,
   verifyBookingAccess,
@@ -12,18 +12,20 @@ import {
 const SECRET = "test-secret-with-enough-entropy-000000000";
 
 describe("access tokens", () => {
-  it("are 256-bit, URL-safe and unique", () => {
-    const tokens = new Set(Array.from({ length: 50 }, generateAccessToken));
-    expect(tokens.size).toBe(50);
-    for (const t of tokens) expect(t).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  it("are 256-bit, URL-safe, stable per booking and secret-dependent", () => {
+    const a = deriveAccessToken(SECRET, "booking-a");
+    expect(a).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(deriveAccessToken(SECRET, "booking-a")).toBe(a);
+    expect(deriveAccessToken(SECRET, "booking-b")).not.toBe(a);
+    expect(deriveAccessToken(`${SECRET}x`, "booking-a")).not.toBe(a);
   });
 
   it("match only their own hash", () => {
-    const token = generateAccessToken();
+    const token = deriveAccessToken(SECRET, "booking-a");
     const hash = hashAccessToken(token);
     expect(hash).toMatch(/^[0-9a-f]{64}$/);
     expect(accessTokenMatches(token, hash)).toBe(true);
-    expect(accessTokenMatches(generateAccessToken(), hash)).toBe(false);
+    expect(accessTokenMatches(deriveAccessToken(SECRET, "booking-b"), hash)).toBe(false);
     expect(accessTokenMatches(token, "not-a-hash")).toBe(false);
   });
 });
