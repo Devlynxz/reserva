@@ -49,7 +49,7 @@ Full schema + hand-written SQL: `docs/PLAN.md` §2.
 - `User`/`Session`/`Account`/`Verification` (Better Auth) + `role: ADMIN | STAFF`, `disabledAt`. Sign-up disabled; ADMIN manages staff at `/admin/team`.
 - `Resource`: slug, name, type `SPACE | STAFF`, description, capacity, photos, isActive, sortOrder
 - `Offering` (package/service): slug, resources (m2m), name, mode `WINDOW | SLOT`; WINDOW: startMinute, endMinute, endsNextDay (CHECK-enforced = end ≤ start); SLOT: durationMin, slotStepMin; both: bufferMin, basePrice, weekendPrice, includedGuests, maxGuests, extraGuestFee, isActive
-- `BusinessHours` (resourceId?, weekday, openMinute, closeMinute) — resource rows replace global rows for that weekday; several rows = split shifts
+- `BusinessHours` (resourceId?, weekday, openMinute, closeMinute) — a resource with any rows of its own follows only its own schedule (days without rows = off); several rows = split shifts
 - `PricingOverride`: resourceId?, offeringId?, startDate, endDate (inclusive), fixedPrice | multiplier, label
 - `BlockedPeriod`: resourceId? (null = whole business), startAt, endAt, span*, reason
 - `Booking`: referenceCode (unique), accessTokenHash, resourceId, offeringId, startAt, endAt, occupiedUntil, span*, customerName/Email/Phone, guestCount, customerNotes, internalNotes, totalAmount, depositAmount, amountPaid, currency, priceBreakdown, status, source `ONLINE | WALK_IN | MESSAGE`, holdExpiresAt, paymentProvider, checkoutSessionId, reminderSentAt
@@ -92,4 +92,6 @@ Out of scope for v1: provider refunds, rescheduling, multi-resource bookings, ad
 
 ## Commands
 
-`npm run dev` · `build` · `test` · `typecheck` · `lint` · `db:migrate` · `db:deploy` · `db:seed` (`SEED_PRESET=resort|court|salon`)
+`npm run dev` · `build` · `test` · `typecheck` · `lint` · `db:migrate` · `db:deploy` · `db:seed` (`SEED_PRESET=resort|court|salon`, wipes the DB)
+
+DB-backed tests (`src/server/__tests__/db`) run only against `TEST_DATABASE_URL` (truncated freely) and are skipped without it. Prisma 7's `migrate` doesn't regenerate the client: run `db:generate` after schema changes.

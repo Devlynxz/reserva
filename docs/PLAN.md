@@ -215,8 +215,8 @@ model Offering {
   @@map("offerings")
 }
 
-/// Rows for a weekday. No rows means closed. Resource rows replace the global
-/// (resourceId = null) rows for that weekday. Several rows per day allow split shifts.
+/// Rows for a weekday. No rows means closed. A resource with any rows of its own follows
+/// only its own schedule; otherwise the global (resourceId = null) rows. Several rows per day allow split shifts.
 model BusinessHours {
   id          String    @id @default(uuid(7)) @db.Uuid
   resourceId  String?   @map("resource_id") @db.Uuid

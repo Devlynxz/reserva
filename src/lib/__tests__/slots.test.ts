@@ -33,8 +33,10 @@ const busy = (resourceId: string, from: string, to: string, date = TUESDAY): Bus
 });
 
 describe("hoursFor", () => {
-  it("uses the resource's own rows when it has any for that weekday", () => {
+  it("uses only the resource's own schedule when it has one", () => {
     expect(hoursFor("ana", 2, hours).map((h) => h.openMinute)).toEqual([H("10:00")]);
+    // Ana has no Wednesday rows of her own: that's her day off, even though the business is open.
+    expect(hoursFor("ana", 3, hours)).toEqual([]);
   });
 
   it("falls back to business-wide rows, sorted", () => {

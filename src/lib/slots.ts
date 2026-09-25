@@ -27,13 +27,14 @@ function assertSlotOffering({ durationMin, slotStepMin, bufferMin }: SlotOfferin
 }
 
 /**
- * Opening intervals for one resource on one weekday. A resource's own rows for that
- * weekday REPLACE the business-wide rows; no rows at all means closed.
+ * Opening intervals for one resource on one weekday. A resource with ANY hours of its own
+ * follows only its own schedule (so a stylist can have a day off while the salon is open);
+ * otherwise it follows the business-wide hours. No rows for the weekday = closed.
  */
 export function hoursFor(resourceId: string, weekday: number, hours: readonly HoursRow[]): HoursRow[] {
-  const own = hours.filter((h) => h.resourceId === resourceId && h.weekday === weekday);
-  const rows = own.length > 0 ? own : hours.filter((h) => h.resourceId === null && h.weekday === weekday);
-  return rows.toSorted((a, b) => a.openMinute - b.openMinute);
+  const own = hours.filter((h) => h.resourceId === resourceId);
+  const schedule = own.length > 0 ? own : hours.filter((h) => h.resourceId === null);
+  return schedule.filter((h) => h.weekday === weekday).toSorted((a, b) => a.openMinute - b.openMinute);
 }
 
 /** Candidate start minutes (local) for the given opening intervals, ascending, unique. */
