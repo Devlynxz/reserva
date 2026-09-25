@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/*
+ * Reserva design tokens.
+ * Neutrals are a cool slate (light) / deep harbour navy (dark). The brand color is the
+ * one per-client variable: the root layout overrides --brand and --brand-contrast from
+ * Settings, and every brand tint below is derived from it with color-mix, so a new
+ * client only ever sets one hex.
+ */
+
+:root {
+  color-scheme: light;
+
+  --brand: #0e7c86;
+  --brand-contrast: #ffffff;
+
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface-muted: #eef1f5;
+  --ink: #15202b;
+  --ink-muted: #566271;
+  --line: #d9dfe7;
+  --line-strong: #b9c2ce;
+
+  --success: #1d7348;
+  --warning: #8f5b00;
+  --danger: #b42318;
+  --info: #1f5fa6;
+
+  /* How much of the brand survives when brand-colored TEXT is mixed toward the ink. */
+  --brand-ink-strength: 72%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --bg: #0c141e;
+    --surface: #121d2a;
+    --surface-muted: #182636;
+    --ink: #e6ecf2;
+    --ink-muted: #98a6b6;
+    --line: #243447;
+    --line-strong: #34495f;
+
+    --success: #4cc58a;
+    --warning: #e0a53a;
+    --danger: #f2786d;
+    --info: #71a7ec;
+
+    --brand-ink-strength: 48%;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-brand: var(--brand);
+  --color-brand-contrast: var(--brand-contrast);
+  /* Brand text/links: pulled toward the ink so it stays legible in both themes. */
+  --color-brand-ink: color-mix(in oklab, var(--brand) var(--brand-ink-strength), var(--ink));
+  /* Quiet brand fills: selected days, current step, soft badges. */
+  --color-brand-soft: color-mix(in oklab, var(--brand) 13%, var(--surface));
+  --color-brand-hover: color-mix(in oklab, var(--brand) 86%, var(--ink));
+
+  --color-success: var(--success);
+  --color-success-soft: color-mix(in oklab, var(--success) 13%, var(--surface));
+  --color-warning: var(--warning);
+  --color-warning-soft: color-mix(in oklab, var(--warning) 14%, var(--surface));
+  --color-danger: var(--danger);
+  --color-danger-soft: color-mix(in oklab, var(--danger) 12%, var(--surface));
+  --color-info: var(--info);
+  --color-info-soft: color-mix(in oklab, var(--info) 12%, var(--surface));
+
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radius follows hierarchy: controls < cards; pills for status. */
+  --radius-control: 0.625rem;
+  --radius-card: 1rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* Dialog: one purposeful motion — it rises into place when opened. */
+dialog[open] {
+  animation: dialog-in 160ms ease-out;
+}
+dialog::backdrop {
+  background: color-mix(in oklab, #0c141e 55%, transparent);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
