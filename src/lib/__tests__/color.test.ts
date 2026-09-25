@@ -39,4 +39,8 @@ describe("brandCssVars", () => {
     const css = brandCssVars("red;}</style><script>alert(1)</script>", "#0e7c86");
     expect(css).toBe("--brand:#0e7c86;--brand-contrast:#ffffff;");
   });
+
+  it("uses the built-in default when the fallback is invalid too", () => {
+    expect(brandCssVars("nope", "also-nope")).toBe("--brand:#0e7c86;--brand-contrast:#ffffff;");
+  });
 });

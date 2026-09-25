@@ -14,5 +14,13 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
     // DB-backed suites share one database; run files serially so they can't interfere.
     fileParallelism: false,
+    coverage: {
+      provider: "v8",
+      include: ["src/lib/**/*.ts"],
+      exclude: ["src/lib/**/__tests__/**"],
+      reporter: ["text-summary", "html"],
+      // Domain logic is the part of the app that's cheap to test exhaustively — keep it that way.
+      thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 },
+    },
   },
 });

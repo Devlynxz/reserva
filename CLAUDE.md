@@ -66,7 +66,7 @@ src/app/(auth)/          sign-in
 src/app/(admin)/admin/   dashboard, calendar, bookings, resources, offerings, hours, pricing, blocked, settings, team, reports
 src/app/api/             auth/[...all], availability, webhooks/[provider], inngest, admin/reports/export
 src/components/          ui/, booking/, admin/
-src/lib/                 money, dates, intervals, windows, slots, pricing, booking-status, reference-code, validation, csv
+src/lib/                 money, dates, intervals, availability, windows, slots, pricing, booking-status, reference-code, validation, csv (100% coverage enforced)
 src/server/              data/, actions/, payments/, email/, inngest/, session.ts
 src/proxy.ts             CSP nonce + cheap /admin redirect (authz is enforced in layouts/actions/data, never only here)
 src/generated/prisma/    generated client (gitignored)
