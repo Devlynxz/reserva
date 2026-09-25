@@ -5,11 +5,11 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-control font-semibold whitespace-nowrap " +
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap " +
   "transition-colors disabled:pointer-events-none disabled:opacity-50 aria-busy:cursor-progress";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-brand-contrast hover:bg-brand-hover",
+  primary: "bg-brand text-brand-contrast shadow-sm hover:bg-brand-hover active:bg-brand-hover",
   secondary: "border border-line-strong bg-surface text-ink hover:bg-surface-muted",
   ghost: "text-ink hover:bg-surface-muted",
   danger: "bg-danger text-white hover:opacity-90 dark:text-bg",
@@ -17,9 +17,9 @@ const variants: Record<ButtonVariant, string> = {
 
 // Every size keeps a ≥40px hit area; md/lg meet the 44px mobile target.
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-10 px-3 text-sm",
-  md: "h-11 px-4 text-[0.9375rem]",
-  lg: "h-13 px-6 text-base",
+  sm: "h-10 px-4 text-sm",
+  md: "h-11 px-5 text-[0.9375rem]",
+  lg: "h-13 px-7 text-base",
 };
 
 /** For links styled as buttons: `<Link className={buttonStyles()} …>`. */

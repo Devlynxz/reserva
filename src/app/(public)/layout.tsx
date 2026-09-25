@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PoweredByReserva } from "@/components/brand/reserva-logo";
 import { buttonStyles } from "@/components/ui";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
@@ -12,7 +13,7 @@ export default async function PublicLayout({ children }: { children: React.React
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
-          <Link href="/" className="min-w-0 truncate text-base font-extrabold tracking-tight sm:text-lg">
+          <Link href="/" className="min-w-0 truncate font-heading text-lg font-bold tracking-tight sm:text-xl">
             {settings?.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size
               <img src={settings.logoUrl} alt={name} className="h-8 w-auto" />
@@ -39,13 +40,17 @@ export default async function PublicLayout({ children }: { children: React.React
       </div>
 
       <footer className="border-t border-line bg-surface">
-        <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-8 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        {/* Extra bottom room on phones: pages pin a full-width action bar there. */}
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-8 pb-28 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:pb-8">
           <p>
             © {year} {name}
           </p>
-          <Link href="/sign-in" className="underline-offset-4 hover:text-ink hover:underline">
-            Staff sign in
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Link href="/sign-in" className="underline-offset-4 hover:text-ink hover:underline">
+              Staff sign in
+            </Link>
+            <PoweredByReserva />
+          </div>
         </div>
       </footer>
     </div>

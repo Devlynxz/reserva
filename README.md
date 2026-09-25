@@ -184,7 +184,7 @@ Preview deployments use their own URL for sign-in, email links and checkout retu
 
 No code changes: a new client is a new deployment, a database and a seed.
 
-1. **Brand defaults** — edit `reserva.config.ts` (name, tagline, color, locale, defaults for currency, timezone, deposit and hold). These seed the Settings row; the owner can change everything later in the admin.
+1. **Brand defaults** — edit `reserva.config.ts` (name, tagline, color, locale, defaults for currency, timezone, deposit and hold). These seed the Settings row; the owner can change everything later in the admin. Favicons and home-screen icons default to the Reserva mark: replace the files in `public/brand/icons/` with the client's (same names and sizes). The Reserva logo itself only appears in the admin, on staff sign-in and in the footer's "Powered by" line.
 2. **Pick a starting preset** — `resort`, `court` or `salon` is closest; copy one in `prisma/seeds/` for the client's real resources, packages, hours and special rates if you want to hand over a ready catalog.
 3. **Deploy** as above, with the client's domain as `BETTER_AUTH_URL` / `NEXT_PUBLIC_APP_URL`.
 4. **Seed once** in production with real passwords:

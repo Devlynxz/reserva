@@ -32,7 +32,7 @@ export const resort: SeedPresetDefinition = {
   settings: {
     businessName: "Villa Serena Private Resort",
     tagline: "Your own pool, your own time.",
-    brandColor: "#0e7c86",
+    brandColor: "#2e7d6b",
     currency: "PHP",
     timezone: "Asia/Manila",
     depositPercent: "50",

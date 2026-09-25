@@ -48,7 +48,7 @@ export default async function BookingsPage({ searchParams }: { searchParams: Sea
         </Link>
       </div>
 
-      <form className="grid gap-3 rounded-card border border-line bg-surface p-4 sm:grid-cols-2 lg:grid-cols-6" role="search">
+      <form className="grid gap-3 rounded-card border border-line bg-surface shadow-card p-4 sm:grid-cols-2 lg:grid-cols-6" role="search">
         <label className="space-y-1 lg:col-span-2">
           <span className="text-sm font-semibold">Search</span>
           <Input name="q" defaultValue={q} placeholder="Reference, name, email or phone" />

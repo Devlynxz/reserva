@@ -4,10 +4,10 @@
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "3rem 1rem", color: "#15202b", background: "#f4f6f9" }}>
+      <body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "3rem 1rem", color: "#02272d", background: "#f3f7f5" }}>
         <main style={{ maxWidth: 480, margin: "0 auto" }}>
           <h1 style={{ fontSize: 24 }}>The site is having trouble</h1>
-          <p style={{ color: "#566271", lineHeight: 1.6 }}>Nothing was charged. Please try again in a few minutes.</p>
+          <p style={{ color: "#4d6166", lineHeight: 1.6 }}>Nothing was charged. Please try again in a few minutes.</p>
           <button
             type="button"
             onClick={reset}

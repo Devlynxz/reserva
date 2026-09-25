@@ -14,8 +14,9 @@ export default async function OpenGraphImage() {
   const name = settings?.businessName ?? reservaConfig.brand.name;
   const line = settings?.tagline ?? reservaConfig.brand.tagline;
   const brand = normalizeHex(settings?.brandColor ?? "") ?? reservaConfig.brand.color;
-  const ink = readableTextOn(brand);
+  const onBrand = readableTextOn(brand);
 
+  // The brand kit's look: a harbour ground, white type, the client's color as the accent.
   return new ImageResponse(
     (
       <div
@@ -26,18 +27,32 @@ export default async function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: brand,
-          color: ink,
+          background: "#02272d",
+          color: "#ffffff",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 30, fontWeight: 600, opacity: 0.85 }}>Book online</div>
+        <div style={{ display: "flex" }}>
+          <div
+            style={{
+              display: "flex",
+              padding: "10px 22px",
+              borderRadius: 999,
+              background: brand,
+              color: onBrand,
+              fontSize: 26,
+              fontWeight: 600,
+            }}
+          >
+            Book online
+          </div>
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ display: "flex", fontSize: 84, fontWeight: 800, lineHeight: 1.02, letterSpacing: -2 }}>{name}</div>
-          <div style={{ display: "flex", fontSize: 38, opacity: 0.9 }}>{line}</div>
+          <div style={{ display: "flex", fontSize: 38, color: "#cfe3dd" }}>{line}</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 28 }}>
-          <div style={{ display: "flex", width: 44, height: 4, background: ink, borderRadius: 2 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 28, color: "#cfe3dd" }}>
+          <div style={{ display: "flex", width: 44, height: 4, background: brand, borderRadius: 2 }} />
           See open dates and pay your deposit in minutes
         </div>
       </div>

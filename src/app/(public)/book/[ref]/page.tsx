@@ -102,7 +102,7 @@ function Ticket({
 
   return (
     <main className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
-      <article className="overflow-hidden rounded-card border border-line bg-surface" aria-labelledby="ticket-title">
+      <article className="overflow-hidden rounded-card border border-line bg-surface shadow-card" aria-labelledby="ticket-title">
         <header className="space-y-3 p-5 sm:p-7">
           <Badge tone={copy.tone} dot>
             {copy.badge}

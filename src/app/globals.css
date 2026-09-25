@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 /*
- * Reserva design tokens.
- * Neutrals are a cool slate (light) / deep harbour navy (dark). The brand color is the
- * one per-client variable: the root layout overrides --brand and --brand-contrast from
- * Settings, and every brand tint below is derived from it with color-mix, so a new
- * client only ever sets one hex.
+ * Reserva design tokens, from the Reserva brand kit (colors sampled from the logo).
+ * Neutrals are harbour-tinted: mist surfaces and harbour ink in light, harbour grounds in
+ * dark. The brand color is the one per-client variable: the root layout overrides --brand
+ * and --brand-contrast from Settings, and every brand tint below is derived from it with
+ * color-mix, so a new client only ever sets one hex.
  */
 
 :root {
   color-scheme: light;
 
-  --brand: #0e7c86;
+  --brand: #2e7d6b;
   --brand-contrast: #ffffff;
 
-  --bg: #f4f6f9;
+  --bg: #f3f7f5;
   --surface: #ffffff;
-  --surface-muted: #eef1f5;
-  --ink: #15202b;
-  --ink-muted: #566271;
-  --line: #d9dfe7;
-  --line-strong: #b9c2ce;
+  --surface-muted: #eef5f2;
+  --ink: #02272d;
+  --ink-muted: #4d6166;
+  --line: #d7e3df;
+  --line-strong: #adc0bb;
 
   --success: #1d7348;
   --warning: #8f5b00;
@@ -35,13 +35,13 @@
   :root {
     color-scheme: dark;
 
-    --bg: #0c141e;
-    --surface: #121d2a;
-    --surface-muted: #182636;
-    --ink: #e6ecf2;
-    --ink-muted: #98a6b6;
-    --line: #243447;
-    --line-strong: #34495f;
+    --bg: #011c21;
+    --surface: #04272d;
+    --surface-muted: #0a333a;
+    --ink: #e5f1ee;
+    --ink-muted: #93aca7;
+    --line: #14424a;
+    --line-strong: #215a62;
 
     --success: #4cc58a;
     --warning: #e0a53a;
@@ -79,10 +79,13 @@
   --color-info-soft: color-mix(in oklab, var(--info) 12%, var(--surface));
 
   --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-outfit), var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 
-  /* Radius follows hierarchy: controls < cards; pills for status. */
-  --radius-control: 0.625rem;
-  --radius-card: 1rem;
+  /* Radius follows hierarchy: controls < cards; pills for buttons and status. */
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+
+  --shadow-card: 0 8px 24px rgb(2 39 45 / 0.08);
 }
 
 @layer base {
@@ -106,6 +109,7 @@
   h1,
   h2,
   h3 {
+    font-family: var(--font-heading);
     text-wrap: balance;
     letter-spacing: -0.015em;
   }
@@ -120,7 +124,7 @@ dialog[open] {
   animation: dialog-in 160ms ease-out;
 }
 dialog::backdrop {
-  background: color-mix(in oklab, #0c141e 55%, transparent);
+  background: color-mix(in oklab, #02272d 55%, transparent);
 }
 
 @keyframes dialog-in {

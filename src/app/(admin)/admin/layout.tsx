@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { type NavGroup, AdminNav } from "@/components/admin/admin-nav";
+import { ReservaLogo } from "@/components/brand/reserva-logo";
 import { canAccess } from "@/lib/permissions";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { requireArea } from "@/server/session";
@@ -48,8 +49,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-dvh">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/admin" className="min-w-0 truncate font-extrabold">
-            {settings?.businessName ?? reservaConfig.brand.name}
+          <Link href="/admin" className="flex min-w-0 items-center gap-2.5">
+            <ReservaLogo variant="mark" height={28} />
+            <span className="truncate font-heading text-lg font-bold">{settings?.businessName ?? reservaConfig.brand.name}</span>
           </Link>
           <div className="flex shrink-0 items-center gap-3">
             <Link href="/" className="hidden text-sm font-semibold text-ink-muted hover:text-ink sm:inline">

@@ -14,7 +14,7 @@ export default function BookLoading() {
       <div className="h-8 w-56 animate-pulse rounded bg-surface-muted" aria-hidden="true" />
       <div className="mt-6 space-y-3" aria-hidden="true">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-28 animate-pulse rounded-card border border-line bg-surface" />
+          <div key={i} className="h-28 animate-pulse rounded-card border border-line bg-surface shadow-card" />
         ))}
       </div>
     </div>

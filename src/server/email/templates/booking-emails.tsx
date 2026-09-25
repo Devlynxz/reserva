@@ -15,7 +15,7 @@ export type BookingEmailProps = {
   link: string;
 };
 
-const title = { color: "#15202b", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.01em", lineHeight: "30px", margin: "0 0 12px" } as const;
+const title = { color: "#02272d", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.01em", lineHeight: "30px", margin: "0 0 12px" } as const;
 const reference = { ...text, fontSize: "22px", fontWeight: 800, letterSpacing: "0.08em", margin: "0 0 4px" } as const;
 
 function Reference({ code }: { code: string }) {

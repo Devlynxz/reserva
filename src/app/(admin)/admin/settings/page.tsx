@@ -57,7 +57,7 @@ export default async function SettingsPage() {
           <CardBody className="grid gap-4 sm:grid-cols-2">
             <AdminField name="businessName" label="Business name" required defaultValue={s.businessName} />
             <AdminField name="tagline" label="Tagline" defaultValue={s.tagline} />
-            <AdminField name="brandColor" label="Brand color" required defaultValue={s.brandColor} placeholder="#0e7c86" hint="A hex color. Text on it switches between white and dark automatically." />
+            <AdminField name="brandColor" label="Brand color" required defaultValue={s.brandColor} placeholder="#2e7d6b" hint="A hex color. Text on it switches between white and dark automatically." />
             <AdminField name="contactPhone" label="Phone" type="tel" defaultValue={s.contactPhone} />
             <AdminField name="contactEmail" label="Email" type="email" defaultValue={s.contactEmail} hint="Customers' replies to booking emails go here." />
             <AdminField name="address" label="Address" defaultValue={s.address} className="sm:col-span-2" />

@@ -111,7 +111,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
       </form>
 
       {view === "month" ? (
-        <div className="overflow-x-auto rounded-card border border-line bg-surface" role="region" aria-label="Month" tabIndex={0}>
+        <div className="overflow-x-auto rounded-card border border-line bg-surface shadow-card" role="region" aria-label="Month" tabIndex={0}>
           <div className="grid min-w-[48rem] grid-cols-7 border-b border-line bg-surface-muted text-center text-xs font-semibold text-ink-muted">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
               <div key={d} className="py-2">
@@ -158,7 +158,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-card border border-line bg-surface" role="region" aria-label="Week" tabIndex={0}>
+        <div className="overflow-x-auto rounded-card border border-line bg-surface shadow-card" role="region" aria-label="Week" tabIndex={0}>
           <table className="w-full min-w-[56rem] border-collapse text-sm">
             <thead className="bg-surface-muted">
               <tr>

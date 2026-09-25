@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree } from "next/font/google";
+import { Figtree, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { DemoBanner } from "@/components/demo-banner";
 import { brandCssVars } from "@/lib/color";
@@ -8,6 +8,8 @@ import { reservaConfig } from "@reserva/config";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
+// Headings (h1–h3 in globals.css, or the font-heading utility).
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettingsOrNull();
@@ -20,13 +22,22 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: name,
     openGraph: { type: "website", siteName: name, title: name, description, locale: reservaConfig.locale.replace("-", "_") },
     twitter: { card: "summary_large_image", title: name, description },
+    // The Reserva mark by default; a client swaps the files in public/brand/icons.
+    icons: {
+      icon: [
+        { url: "/brand/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+        { url: "/brand/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/brand/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
+      ],
+      apple: { url: "/brand/icons/apple-touch-icon.png", sizes: "180x180" },
+    },
   };
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f6f9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c141e" },
+    { media: "(prefers-color-scheme: light)", color: "#f3f7f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#011c21" },
   ],
 };
 
@@ -37,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const brand = brandCssVars(settings?.brandColor ?? reservaConfig.brand.color, reservaConfig.brand.color);
 
   return (
-    <html lang="en" className={figtree.variable}>
+    <html lang="en" className={`${figtree.variable} ${outfit.variable}`}>
       <head>
         <style nonce={nonce}>{`:root{${brand}}`}</style>
       </head>

@@ -13,7 +13,7 @@ export function Table({ label, className, children }: { label: string; className
       role="region"
       aria-label={label}
       tabIndex={0}
-      className={cn("relative overflow-x-auto rounded-card border border-line bg-surface", className)}
+      className={cn("relative overflow-x-auto rounded-card border border-line bg-surface shadow-card", className)}
     >
       <table className="w-full min-w-[36rem] border-collapse text-left text-sm">{children}</table>
     </div>

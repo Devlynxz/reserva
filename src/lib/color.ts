@@ -35,6 +35,6 @@ export function readableTextOn(hex: string): "#ffffff" | "#0f1720" {
 
 /** CSS custom properties for the brand; falls back when the stored value is invalid. */
 export function brandCssVars(input: string, fallback: string): string {
-  const brand = normalizeHex(input) ?? normalizeHex(fallback) ?? "#0e7c86";
+  const brand = normalizeHex(input) ?? normalizeHex(fallback) ?? "#2e7d6b";
   return `--brand:${brand};--brand-contrast:${readableTextOn(brand)};`;
 }

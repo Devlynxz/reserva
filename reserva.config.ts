@@ -12,8 +12,8 @@ export const reservaConfig = {
     name: "Reserva",
     tagline: "Booked, paid, confirmed.",
     description: "See real availability, pay a deposit, and get your booking confirmed on the spot.",
-    /** Default brand color; Settings.brandColor overrides it at runtime. */
-    color: "#0e7c86",
+    /** Default brand color (the kit's green, deepened to 4.9:1 on white); Settings.brandColor overrides it at runtime. */
+    color: "#2e7d6b",
   },
   locale: "en-PH",
   /** Seeded into Settings on first run. */

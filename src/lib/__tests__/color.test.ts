@@ -24,6 +24,9 @@ describe("contrast", () => {
 
   it("picks readable text for dark and light brands", () => {
     expect(readableTextOn("#0e7c86")).toBe("#ffffff");
+    // The default brand green keeps white text (it was deepened from the kit's #378d78 for AA).
+    expect(readableTextOn("#2e7d6b")).toBe("#ffffff");
+    expect(contrastRatio("#2e7d6b", "#ffffff")).toBeGreaterThanOrEqual(4.5);
     expect(readableTextOn("#1e3a8a")).toBe("#ffffff");
     expect(readableTextOn("#facc15")).toBe("#0f1720");
     expect(readableTextOn("#a7f3d0")).toBe("#0f1720");
@@ -41,6 +44,6 @@ describe("brandCssVars", () => {
   });
 
   it("uses the built-in default when the fallback is invalid too", () => {
-    expect(brandCssVars("nope", "also-nope")).toBe("--brand:#0e7c86;--brand-contrast:#ffffff;");
+    expect(brandCssVars("nope", "also-nope")).toBe("--brand:#2e7d6b;--brand-contrast:#ffffff;");
   });
 });

@@ -53,7 +53,7 @@ export const timeZoneSchema = z.string().trim().refine(isValidTimeZone, "Unknown
 
 export const hexColorSchema = z
   .string()
-  .transform((v, ctx) => normalizeHex(v) ?? (ctx.addIssue({ code: "custom", message: "Use a hex color like #0e7c86." }), z.NEVER));
+  .transform((v, ctx) => normalizeHex(v) ?? (ctx.addIssue({ code: "custom", message: "Use a hex color like #2e7d6b." }), z.NEVER));
 
 const optionalText = (max: number) =>
   z

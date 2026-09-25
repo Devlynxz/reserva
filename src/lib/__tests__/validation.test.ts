@@ -63,7 +63,7 @@ describe("primitives", () => {
     expect(timeZoneSchema.safeParse("Mars/Base").success).toBe(false);
 
     expect(hexColorSchema.parse("#0E7C86")).toBe("#0e7c86");
-    expect(firstMessage(hexColorSchema.safeParse("red"))).toBe("Use a hex color like #0e7c86.");
+    expect(firstMessage(hexColorSchema.safeParse("red"))).toBe("Use a hex color like #2e7d6b.");
   });
 });
 

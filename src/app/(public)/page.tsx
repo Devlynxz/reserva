@@ -59,7 +59,7 @@ export default async function HomePage() {
         </div>
 
         {openings.length > 0 && (
-          <div className="rounded-card border border-line bg-surface">
+          <div className="rounded-card border border-line bg-surface shadow-card">
             <h2 className="border-b border-line px-5 py-3.5 text-sm font-semibold text-ink-muted">Next openings</h2>
             <ul className="divide-y divide-line">
               {openings.map(({ offering, startAt }) => (
@@ -223,8 +223,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Mobile: keep the main action in reach. Spacer stops it covering the footer. */}
-      <div className="h-20 sm:hidden" aria-hidden="true" />
+      {/* Mobile: keep the main action in reach. The footer leaves room for it. */}
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 p-3 backdrop-blur sm:hidden">
         <Link href="/book" className={buttonStyles({ size: "lg", className: "w-full" })}>
           Book now

@@ -117,7 +117,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-card border border-line bg-surface p-4">
+    <div className="rounded-card border border-line bg-surface shadow-card p-4">
       <dt className="text-sm text-ink-muted">{label}</dt>
       <dd className="mt-1 text-xl font-extrabold break-words tabular-nums sm:text-2xl">{value}</dd>
       <dd className="text-sm text-ink-muted">{detail}</dd>

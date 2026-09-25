@@ -11,22 +11,22 @@ export type EmailBrand = {
   address: string | null;
 };
 
-export const text = { color: "#15202b", fontSize: "15px", lineHeight: "24px", margin: "0 0 12px" } as const;
-export const muted = { ...text, color: "#566271", fontSize: "14px" } as const;
+export const text = { color: "#02272d", fontSize: "15px", lineHeight: "24px", margin: "0 0 12px" } as const;
+export const muted = { ...text, color: "#4d6166", fontSize: "14px" } as const;
 
 export function EmailLayout({ brand, preview, children }: { brand: EmailBrand; preview: string; children: ReactNode }) {
   return (
     <Html lang="en">
       <Head />
       <Preview>{preview}</Preview>
-      <Body style={{ backgroundColor: "#f4f6f9", fontFamily: "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: "24px 0" }}>
-        <Container style={{ backgroundColor: "#ffffff", border: "1px solid #d9dfe7", borderRadius: "16px", maxWidth: "560px", overflow: "hidden" }}>
+      <Body style={{ backgroundColor: "#f3f7f5", fontFamily: "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: "24px 0" }}>
+        <Container style={{ backgroundColor: "#ffffff", border: "1px solid #d7e3df", borderRadius: "20px", maxWidth: "560px", overflow: "hidden" }}>
           <Section style={{ backgroundColor: brand.brandColor, height: "6px" }} />
           <Section style={{ padding: "28px 32px 8px" }}>
             <Text style={{ ...muted, fontWeight: 600, margin: "0 0 20px" }}>{brand.businessName}</Text>
             {children}
           </Section>
-          <Hr style={{ borderColor: "#d9dfe7", margin: "8px 0 0" }} />
+          <Hr style={{ borderColor: "#d7e3df", margin: "8px 0 0" }} />
           <Section style={{ padding: "16px 32px 24px" }}>
             <Text style={{ ...muted, fontSize: "13px", margin: 0 }}>
               {brand.businessName}
@@ -65,10 +65,10 @@ export type DetailRow = { label: string; value: string };
 
 export function Details({ rows }: { rows: DetailRow[] }) {
   return (
-    <Section style={{ backgroundColor: "#f4f6f9", borderRadius: "12px", margin: "8px 0 20px", padding: "16px 20px" }}>
+    <Section style={{ backgroundColor: "#f3f7f5", borderRadius: "12px", margin: "8px 0 20px", padding: "16px 20px" }}>
       {rows.map((row) => (
         <Text key={row.label} style={{ ...text, margin: "0 0 8px" }}>
-          <span style={{ color: "#566271", display: "block", fontSize: "13px" }}>{row.label}</span>
+          <span style={{ color: "#4d6166", display: "block", fontSize: "13px" }}>{row.label}</span>
           <strong>{row.value}</strong>
         </Text>
       ))}
