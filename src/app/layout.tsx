@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree } from "next/font/google";
 import { headers } from "next/headers";
+import { DemoBanner } from "@/components/demo-banner";
 import { brandCssVars } from "@/lib/color";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
@@ -40,7 +41,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <style nonce={nonce}>{`:root{${brand}}`}</style>
       </head>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+        {/* First tab stop on every page. Public and admin layouts both mark their content #main. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-surface focus:px-3 focus:py-2 focus:text-ink"
+        >
+          Skip to content
+        </a>
+        <DemoBanner />
+        {children}
+      </body>
     </html>
   );
 }

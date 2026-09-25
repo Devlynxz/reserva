@@ -103,7 +103,7 @@ export function BookingFlow({
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-6 pb-32 sm:px-6 sm:pt-10">
+    <main className="mx-auto max-w-3xl px-4 pt-6 pb-32 sm:px-6 sm:pt-10">
       <Stepper steps={STEPS} current={step} className="mb-8" />
       <h1 ref={headingRef} tabIndex={-1} className="scroll-mt-24 text-2xl font-extrabold outline-none sm:text-3xl">
         {["Choose a package", "Pick a date", "Your details", "Review your booking"][step]}
@@ -148,7 +148,7 @@ export function BookingFlow({
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 

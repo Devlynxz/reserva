@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionForm, AdminCheckbox, AdminField } from "@/components/admin/action-form";
@@ -11,7 +12,11 @@ import { changeStatusAction, recordPaymentAction, saveNotesAction } from "@/serv
 import { getBookingDetail } from "@/server/data/admin-bookings";
 import { requireArea } from "@/server/session";
 import { adminFormat } from "../../_shared/format";
-import { StatusActions } from "./status-actions";
+
+// Dialog-heavy and only needed when staff act on a booking: its own chunk.
+const StatusActions = dynamic(() => import("./status-actions").then((m) => m.StatusActions), {
+  loading: () => <div className="h-11 w-40 animate-pulse rounded-control bg-surface-muted" />,
+});
 
 export const metadata: Metadata = { title: "Booking", robots: { index: false } };
 

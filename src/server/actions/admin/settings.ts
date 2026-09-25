@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { settingsInputSchema } from "@/lib/validation";
 import { updateSettings } from "../../data/settings";
+import { DEMO_LOCKED, isDemo } from "../../demo";
 import { env } from "../../env";
 import { type FormState, formObject, guard, invalid, isSession } from "./form";
 
@@ -30,6 +31,7 @@ function parseFaq(text: string | undefined) {
 export async function saveSettingsAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const session = await guard("settings");
   if (!isSession(session)) return session;
+  if (isDemo()) return { error: DEMO_LOCKED };
   const raw = formObject(formData, { multi: ["weekendDays"] });
   const parsed = settingsInputSchema.safeParse(raw);
   const more = extra.safeParse(raw);

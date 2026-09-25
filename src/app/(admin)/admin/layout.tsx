@@ -64,7 +64,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </header>
       <div className="mx-auto max-w-7xl gap-8 px-4 sm:px-6 lg:grid lg:grid-cols-[13rem_1fr] lg:py-8">
         <AdminNav groups={groups} />
-        <main className="min-w-0 py-6 lg:py-0">{children}</main>
+        <main id="main" className="min-w-0 py-6 lg:py-0">
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -96,4 +96,6 @@ Out of scope for v1: provider refunds, rescheduling, multi-resource bookings, ad
 
 Payments, email and jobs setup (webhook registration, local testing): `docs/PAYMENTS.md`.
 
+Sentry: `src/instrumentation*.ts`, off without a DSN; every event goes through `lib/scrub.ts`. `DEMO_MODE=true` adds a banner and one-click owner/staff sign-in and locks settings/team changes — never on a real client's site. `CSP_MODE=report-only` for debugging a deployment's CSP.
+
 DB-backed tests (`src/server/__tests__/db`) run only against `TEST_DATABASE_URL` (truncated freely) and are skipped without it. Prisma 7's `migrate` doesn't regenerate the client: run `db:generate` after schema changes.

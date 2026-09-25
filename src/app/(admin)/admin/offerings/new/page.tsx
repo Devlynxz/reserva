@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui";
 import { saveOfferingAction } from "@/server/actions/admin/catalog";
 import { listResources } from "@/server/data/admin-catalog";
 import { requireArea } from "@/server/session";
-import { OfferingForm } from "../offering-form";
+
+// The mode-switching form is only needed on these two pages: load it as its own chunk.
+const OfferingForm = dynamic(() => import("../offering-form").then((m) => m.OfferingForm), {
+  loading: () => <div className="h-96 animate-pulse rounded-card bg-surface-muted" />,
+});
 
 export const metadata: Metadata = { title: "Add package or service", robots: { index: false } };
 

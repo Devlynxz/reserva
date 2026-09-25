@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCsp, createNonce } from "../csp";
+import { BLOB_ORIGIN, buildCsp, createNonce, cspHeaderName, sentryOrigin } from "../csp";
 
 function directives(csp: string): Map<string, string[]> {
   return new Map(
@@ -51,5 +51,26 @@ describe("createNonce", () => {
     const nonces = new Set(Array.from({ length: 100 }, createNonce));
     expect(nonces.size).toBe(100);
     for (const nonce of nonces) expect(nonce).toMatch(/^[A-Za-z0-9+/]{22}==$/);
+  });
+});
+
+describe("sentryOrigin / cspHeaderName", () => {
+  it("allows only the HTTPS ingest origin of a DSN", () => {
+    expect(sentryOrigin("https://abc123@o42.ingest.us.sentry.io/4507")).toBe("https://o42.ingest.us.sentry.io");
+    expect(sentryOrigin("http://abc@insecure.example/1")).toBeNull();
+    expect(sentryOrigin("not a url")).toBeNull();
+    expect(sentryOrigin(undefined)).toBeNull();
+  });
+
+  it("switches to report-only only when asked", () => {
+    expect(cspHeaderName("report-only")).toBe("Content-Security-Policy-Report-Only");
+    expect(cspHeaderName(undefined)).toBe("Content-Security-Policy");
+    expect(cspHeaderName("enforce")).toBe("Content-Security-Policy");
+  });
+
+  it("adds connect origins and the Blob store to the policy", () => {
+    const csp = buildCsp({ nonce: "n", isDev: false, imageOrigins: [BLOB_ORIGIN], connectOrigins: ["https://o42.ingest.us.sentry.io"] });
+    expect(csp).toContain(`img-src 'self' blob: data: ${BLOB_ORIGIN}`);
+    expect(csp).toContain("connect-src 'self' https://o42.ingest.us.sentry.io");
   });
 });

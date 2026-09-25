@@ -44,6 +44,9 @@ const envSchema = z
     // Rate limiting: which request header carries the real client IP (set by your edge).
     CLIENT_IP_HEADER: z.string().trim().toLowerCase().default("x-real-ip"),
 
+    // Content-Security-Policy: "report-only" logs violations without blocking (debugging a deployment).
+    CSP_MODE: z.enum(["enforce", "report-only"]).default("enforce"),
+
     // Demo deployments show a banner and a one-click demo login.
     DEMO_MODE: z
       .enum(["true", "false"])

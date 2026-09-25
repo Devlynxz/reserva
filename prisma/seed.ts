@@ -31,7 +31,8 @@ import type { SeedOffering, SeedPresetDefinition } from "./seeds/types";
 config({ quiet: true });
 
 const PRESETS: Record<string, SeedPresetDefinition> = { resort, court, salon };
-const TARGET_BOOKINGS = 15;
+// Real clients seed with SEED_SAMPLE_BOOKINGS=false: catalog and accounts, no sample bookings.
+const TARGET_BOOKINGS = process.env.SEED_SAMPLE_BOOKINGS === "false" ? 0 : 15;
 const DAY_RANGE = { from: -20, to: 40 }; // ~60 days around today
 
 // ─── Deterministic randomness ───────────────────────────────────────────────
