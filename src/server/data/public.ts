@@ -16,6 +16,7 @@ export type PublicResource = {
 };
 
 export type PublicOffering = {
+  id: string;
   slug: string;
   name: string;
   description: string | null;
@@ -45,6 +46,7 @@ export async function listPublicOfferings(): Promise<PublicOffering[]> {
     },
   });
   return rows.map((o) => ({
+    id: o.id,
     slug: o.slug,
     name: o.name,
     description: o.description,

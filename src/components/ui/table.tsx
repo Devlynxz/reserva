@@ -4,6 +4,8 @@ import { cn } from "./cn";
 /**
  * Tables scroll sideways inside their own region on narrow screens instead of
  * breaking the page. The region is focusable and labelled so keyboard users can scroll it.
+ * `relative` keeps absolutely positioned descendants (sr-only labels) inside the scroller;
+ * without it they widen the whole page.
  */
 export function Table({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
   return (
@@ -11,7 +13,7 @@ export function Table({ label, className, children }: { label: string; className
       role="region"
       aria-label={label}
       tabIndex={0}
-      className={cn("overflow-x-auto rounded-card border border-line bg-surface", className)}
+      className={cn("relative overflow-x-auto rounded-card border border-line bg-surface", className)}
     >
       <table className="w-full min-w-[36rem] border-collapse text-left text-sm">{children}</table>
     </div>

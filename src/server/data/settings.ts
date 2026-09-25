@@ -66,3 +66,36 @@ export async function getSettingsOrNull(): Promise<BusinessSettings | null> {
     return null;
   }
 }
+
+export type SettingsUpdate = {
+  businessName: string;
+  tagline?: string;
+  brandColor: string;
+  currency: string;
+  timezone: string;
+  depositPercent: string;
+  holdMinutes: number;
+  weekendDays: number[];
+  leadTimeMin: number;
+  maxAdvanceDays: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  mapUrl?: string;
+  policies?: string;
+  content: SiteContent;
+};
+
+export async function updateSettings(input: SettingsUpdate): Promise<void> {
+  const data = {
+    ...input,
+    tagline: input.tagline ?? null,
+    contactEmail: input.contactEmail ?? null,
+    contactPhone: input.contactPhone ?? null,
+    address: input.address ?? null,
+    mapUrl: input.mapUrl ?? null,
+    policies: input.policies ?? null,
+    content: input.content,
+  };
+  await db.settings.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
+}

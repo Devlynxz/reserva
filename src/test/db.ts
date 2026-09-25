@@ -103,3 +103,22 @@ export async function openEveryDay(openMinute = 6 * 60, closeMinute = 22 * 60) {
 }
 
 export const customer = (n = 1) => ({ name: `Guest ${n}`, email: `guest${n}@example.com`, phone: "0917 000 0000" });
+
+export const STAFF_PASSWORD = "correct-horse-battery";
+
+/** A staff account created the way /admin/team creates them. */
+export async function createStaffUser(email: string, role: "ADMIN" | "STAFF", options: { disabled?: boolean } = {}) {
+  const { createTeamMember } = await import("@/server/data/team");
+  const id = await createTeamMember({ name: email.split("@")[0]!, email, role, password: STAFF_PASSWORD });
+  if (options.disabled) await db.user.update({ where: { id }, data: { disabledAt: new Date() } });
+  return id;
+}
+
+/** Signs in through Better Auth and returns request headers carrying the session cookie. */
+export async function signedInHeaders(email: string): Promise<Headers> {
+  const { getAuth } = await import("@/server/auth");
+  const response = await getAuth().api.signInEmail({ body: { email, password: STAFF_PASSWORD }, asResponse: true });
+  const cookie = response.headers.get("set-cookie")?.split(";")[0];
+  if (!cookie) throw new Error(`Sign-in failed for ${email} (${response.status})`);
+  return new Headers({ cookie });
+}
