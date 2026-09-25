@@ -95,14 +95,24 @@ export function toAmountString(amount: MoneyInput, currency: string): string {
   return roundMoney(amount, currency).toFixed(currencyDigits(currency));
 }
 
-/** Localized display, e.g. "₱1,250.50". Formats the exact decimal string, not a float. */
-export function formatMoney(amount: MoneyInput, currency: string, locale = "en-PH"): string {
+/**
+ * Localized display, e.g. "₱1,250.50". Formats the exact decimal string, not a float.
+ * `wholeUnits: true` drops a zero fraction ("₱12,000") — for price tags, not receipts.
+ */
+export function formatMoney(
+  amount: MoneyInput,
+  currency: string,
+  locale = "en-PH",
+  options: { wholeUnits?: boolean } = {},
+): string {
   const digits = currencyDigits(currency);
+  const rounded = roundMoney(amount, currency);
+  const minimumFractionDigits = options.wholeUnits && rounded.isInteger() ? 0 : digits;
   const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    minimumFractionDigits: digits,
+    minimumFractionDigits,
     maximumFractionDigits: digits,
   });
-  return formatter.format(roundMoney(amount, currency).toFixed(digits) as Intl.StringNumericLiteral);
+  return formatter.format(rounded.toFixed(digits) as Intl.StringNumericLiteral);
 }

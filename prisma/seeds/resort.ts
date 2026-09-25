@@ -67,7 +67,7 @@ export const resort: SeedPresetDefinition = {
     {
       key: "day-tour",
       name: "Day Tour",
-      description: "8:00 AM to 5:00 PM. Pool, grill and videoke.",
+      description: "The pool, grill and videoke lounge for the day.",
       mode: "WINDOW",
       start: "08:00",
       end: "17:00",
@@ -82,7 +82,7 @@ export const resort: SeedPresetDefinition = {
     {
       key: "overnight",
       name: "Overnight",
-      description: "7:00 PM to 7:00 AM the next day.",
+      description: "An evening swim and a night in air-conditioned rooms.",
       mode: "WINDOW",
       start: "19:00",
       end: "07:00",
@@ -97,7 +97,7 @@ export const resort: SeedPresetDefinition = {
     {
       key: "22-hours",
       name: "22 Hours",
-      description: "2:00 PM to 12:00 noon the next day.",
+      description: "Our longest stay: an afternoon swim through to next-day lunch.",
       mode: "WINDOW",
       start: "14:00",
       end: "12:00",
@@ -112,7 +112,7 @@ export const resort: SeedPresetDefinition = {
     {
       key: "hall-event",
       name: "Hall Event",
-      description: "8:00 AM to 5:00 PM in the function hall, tables and chairs included.",
+      description: "The function hall with tables, chairs and the sound system.",
       mode: "WINDOW",
       start: "08:00",
       end: "17:00",

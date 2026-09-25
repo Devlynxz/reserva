@@ -128,4 +128,10 @@ describe("formatting", () => {
     expect(formatMoney("9007199254740993.01", "USD", "en-US")).toBe("$9,007,199,254,740,993.01");
     expect(formatMoney(1500, "JPY", "en-US")).toBe("¥1,500");
   });
+
+  it("drops a zero fraction for price tags only when asked", () => {
+    expect(formatMoney("12000", "PHP", "en-PH", { wholeUnits: true })).toBe("₱12,000");
+    expect(formatMoney("12000.5", "PHP", "en-PH", { wholeUnits: true })).toBe("₱12,000.50");
+    expect(formatMoney("12000", "PHP")).toBe("₱12,000.00");
+  });
 });

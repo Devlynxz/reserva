@@ -11,7 +11,7 @@ import {
 import { DateError, type LocalDate, addMinutes } from "@/lib/dates";
 import type { BookingSpan } from "@/lib/intervals";
 import { toAmountString } from "@/lib/money";
-import { PricingError, quote, toPriceBreakdown } from "@/lib/pricing";
+import { type PriceBreakdown, PricingError, quote, toPriceBreakdown } from "@/lib/pricing";
 import { generateReferenceCode } from "@/lib/reference-code";
 import { SlotError, isOnGrid, slotSpan } from "@/lib/slots";
 import { modeFieldError } from "@/lib/validation";
@@ -151,6 +151,9 @@ export type CreateBookingInput = {
   actorId?: string | null;
 };
 
+/** The bookable choice without who's booking — what the review step prices. */
+export type BookingSelection = Pick<CreateBookingInput, "offering" | "resourceId" | "date" | "startMinute" | "guestCount" | "source">;
+
 export type CreatedBooking = {
   id: string;
   referenceCode: string;
@@ -169,7 +172,7 @@ export type CreatedBooking = {
 /** Mode-specific step: which resources can take the request, and the time it occupies. */
 async function resolveSpan(
   offering: BookableOffering,
-  input: CreateBookingInput,
+  input: BookingSelection,
   candidates: string[],
   settings: BusinessSettings,
 ): Promise<{ span: BookingSpan; candidates: string[] }> {
@@ -204,19 +207,21 @@ async function resolveSpan(
   }
 }
 
+type PreparedBooking = {
+  settings: BusinessSettings;
+  offering: BookableOffering;
+  span: BookingSpan;
+  /** Resources that can take the request (grid-checked), in preference order. */
+  candidates: string[];
+  priceFor: (resourceId: string) => ReturnType<typeof quote>;
+};
+
 /**
- * The single booking path for both modes and every source (online, walk-in, message).
- *
- *  1. validate the request against the offering (mode fields, resource, grid, horizon)
- *  2. in one transaction: lock candidate resources (ascending id) → expire their stale
- *     holds → pick the first free one → price it → insert the booking + its first event
- *  3. map 23P01 from the exclusion constraint / block trigger to BookingConflictError
- *
- * Under the lock the free-resource check is exact, so losers of a race get a clean
- * "just taken" before touching the constraint; the constraint remains the guarantee.
+ * Everything short of writing: resolve the offering, candidate resources, the time span
+ * (mode-specific) and pricing, and reject requests that can't be booked. Shared by
+ * `createBooking` and `previewBooking`, so the review step shows exactly what create will charge.
  */
-export async function createBooking(input: CreateBookingInput, options: { now?: Date } = {}): Promise<CreatedBooking> {
-  const now = options.now ?? new Date();
+async function prepareBooking(input: BookingSelection, now: Date): Promise<PreparedBooking> {
   const settings = await getSettings();
   const offering = await findBookableOffering(input.offering);
   if (!offering) throw new BookingInputError("offering_not_found", "That package isn't available.");
@@ -272,6 +277,38 @@ export async function createBooking(input: CreateBookingInput, options: { now?: 
   };
   // Fail fast on guest-count problems before taking any locks.
   priceFor(candidates[0]!);
+  return { settings, offering, span, candidates, priceFor };
+}
+
+export type BookingPreview = {
+  startAt: Date;
+  endAt: Date;
+  price: PriceBreakdown;
+};
+
+/**
+ * The review step's price. Doesn't reserve anything: for "any", it prices the first
+ * candidate — only a resource-specific override could make the final price differ.
+ */
+export async function previewBooking(input: BookingSelection, options: { now?: Date } = {}): Promise<BookingPreview> {
+  const { span, candidates, priceFor } = await prepareBooking(input, options.now ?? new Date());
+  return { startAt: span.startAt, endAt: span.endAt, price: toPriceBreakdown(priceFor(candidates[0]!)) };
+}
+
+/**
+ * The single booking path for both modes and every source (online, walk-in, message).
+ *
+ *  1. validate the request against the offering (mode fields, resource, grid, horizon)
+ *  2. in one transaction: lock candidate resources (ascending id) → expire their stale
+ *     holds → pick the first free one → price it → insert the booking + its first event
+ *  3. map 23P01 from the exclusion constraint / block trigger to BookingConflictError
+ *
+ * Under the lock the free-resource check is exact, so losers of a race get a clean
+ * "just taken" before touching the constraint; the constraint remains the guarantee.
+ */
+export async function createBooking(input: CreateBookingInput, options: { now?: Date } = {}): Promise<CreatedBooking> {
+  const now = options.now ?? new Date();
+  const { settings, offering, span, candidates, priceFor } = await prepareBooking(input, now);
 
   for (let attempt = 1; ; attempt++) {
     try {

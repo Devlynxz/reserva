@@ -4,6 +4,7 @@ import {
   availabilityQuerySchema,
   blockedPeriodInputSchema,
   bookingRequestSchema,
+  bookingSelectionSchema,
   bookingStatusSchema,
   businessHoursInputSchema,
   currencySchema,
@@ -113,6 +114,14 @@ describe("bookingRequestSchema", () => {
     expect(bookingRequestSchema.safeParse({ ...valid, guestCount: "2.5" }).success).toBe(false);
     expect(bookingRequestSchema.safeParse({ ...valid, resourceId: "villa-1" }).success).toBe(false);
     expect(bookingRequestSchema.safeParse({ ...valid, notes: "x".repeat(1001) }).success).toBe(false);
+  });
+});
+
+describe("bookingSelectionSchema", () => {
+  it("is the request without the customer, still strict", () => {
+    const selection = { offeringSlug: "haircut", resourceId: "any", date: "2026-04-04", startTime: "10:00", guestCount: 1 };
+    expect(bookingSelectionSchema.parse(selection)).toEqual({ ...selection, startTime: 600 });
+    expect(bookingSelectionSchema.safeParse({ ...selection, price: "1" }).success).toBe(false);
   });
 });
 

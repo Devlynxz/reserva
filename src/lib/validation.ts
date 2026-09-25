@@ -88,6 +88,10 @@ export const bookingRequestSchema = z
 
 export type BookingRequest = z.infer<typeof bookingRequestSchema>;
 
+/** The choice being priced on the review step: a booking request without the customer. */
+export const bookingSelectionSchema = bookingRequestSchema.omit({ customer: true, notes: true });
+export type BookingSelectionInput = z.infer<typeof bookingSelectionSchema>;
+
 /**
  * The request shape depends on the offering's mode, known only after loading the offering.
  * Returns the problem to show the customer, or null when the fields fit the mode.
