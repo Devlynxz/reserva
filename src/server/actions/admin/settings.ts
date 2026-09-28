@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { settingsInputSchema } from "@/lib/validation";
-import { UploadError, uploadLogo } from "../../blob";
-import { setLogoUrl, updateSettings } from "../../data/settings";
+import { UploadError, uploadIcon, uploadLogo } from "../../blob";
+import { setIconUrl, setLogoUrl, updateSettings } from "../../data/settings";
 import { DEMO_LOCKED, isDemo } from "../../demo";
 import { env } from "../../env";
 import { type FormState, formObject, guard, invalid, isSession } from "./form";
@@ -63,28 +63,52 @@ export async function saveSettingsAction(_prev: FormState, formData: FormData): 
   return { ok: true, message: "Settings saved." };
 }
 
-export async function uploadLogoAction(_prev: FormState, formData: FormData): Promise<FormState> {
+/** Owner-only image upload: validate the field, store it, save its URL, refresh every page. */
+async function replaceImage(
+  formData: FormData,
+  field: "logo" | "icon",
+  upload: (file: File) => Promise<string>,
+  save: (url: string | null) => Promise<void>,
+  message: string,
+): Promise<FormState> {
   const session = await guard("settings");
   if (!isSession(session)) return session;
   if (isDemo()) return { error: DEMO_LOCKED };
-  const file = formData.get("logo");
-  if (!(file instanceof File)) return { error: "Choose an image file.", fieldErrors: { logo: "Choose an image file." } };
+  const file = formData.get(field);
+  if (!(file instanceof File)) return { error: "Choose an image file.", fieldErrors: { [field]: "Choose an image file." } };
   try {
-    await setLogoUrl(await uploadLogo(file));
+    await save(await upload(file));
   } catch (error) {
-    if (error instanceof UploadError) return { error: error.message, fieldErrors: { logo: error.message } };
-    console.error("[logo upload]", error);
+    if (error instanceof UploadError) return { error: error.message, fieldErrors: { [field]: error.message } };
+    console.error(`[${field} upload]`, error);
     return { error: "The upload failed. Please try again." };
   }
+  // The brand shows on every page, in metadata and in the manifest.
   revalidatePath("/", "layout");
-  return { ok: true, message: "Logo updated." };
+  return { ok: true, message };
+}
+
+async function clearImage(save: (url: string | null) => Promise<void>): Promise<FormState> {
+  const session = await guard("settings");
+  if (!isSession(session)) return session;
+  if (isDemo()) return { error: DEMO_LOCKED };
+  await save(null);
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function uploadLogoAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  return replaceImage(formData, "logo", uploadLogo, setLogoUrl, "Logo updated.");
 }
 
 export async function removeLogoAction(): Promise<FormState> {
-  const session = await guard("settings");
-  if (!isSession(session)) return session;
-  if (isDemo()) return { error: DEMO_LOCKED };
-  await setLogoUrl(null);
-  revalidatePath("/", "layout");
-  return { ok: true };
+  return clearImage(setLogoUrl);
+}
+
+export async function uploadIconAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  return replaceImage(formData, "icon", uploadIcon, setIconUrl, "App icon updated.");
+}
+
+export async function removeIconAction(): Promise<FormState> {
+  return clearImage(setIconUrl);
 }
