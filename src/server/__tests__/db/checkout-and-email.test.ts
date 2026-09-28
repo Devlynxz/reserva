@@ -4,6 +4,7 @@ import { addDays, localDateOf, zonedToUtc } from "@/lib/dates";
 import { openCheckout } from "@/server/checkout";
 import { createBooking, transitionBooking } from "@/server/data/bookings";
 import { BookingConfirmedEmail } from "@/server/email/templates/booking-emails";
+import { EmailLayout } from "@/server/email/templates/layout";
 import { resetEnvCache } from "@/server/env";
 import { bookingLink, notifyBookingConfirmed, notifyBookingReceived, sendDueReminders } from "@/server/notifications";
 import { TZ, createResource, createSlotOffering, customer, db, describeDb, openEveryDay, resetDb, seedSettings } from "@/test/db";
@@ -123,7 +124,7 @@ describeDb("emails", () => {
 
     const html = await render(
       BookingConfirmedEmail({
-        brand: { businessName: "Test Resort", brandColor: "#0e7c86", contact: null, address: null },
+        brand: { businessName: "Test Resort", brandColor: "#0e7c86", contact: null, address: null, logoUrl: null },
         brandText: "#ffffff",
         customerName: "Guest",
         referenceCode: booking.referenceCode,
@@ -136,6 +137,19 @@ describeDb("emails", () => {
     expect(html).toContain(booking.referenceCode);
     expect(html).toContain(link.replace(/&/g, "&amp;"));
     expect(html).toContain("You&#x27;re booked");
+  });
+
+  it("puts the owner's logo at the top when there is one, and the name otherwise", async () => {
+    const brand = { businessName: "Test Resort", brandColor: "#2e7d6b", contact: null, address: null };
+    const logo = "https://abc123.public.blob.vercel-storage.com/logos/logo-1.png";
+
+    const withLogo = await render(EmailLayout({ brand: { ...brand, logoUrl: logo }, preview: "Hi", children: "Body" }));
+    expect(withLogo).toContain(`src="${logo}"`);
+    expect(withLogo).toContain('alt="Test Resort"');
+
+    const withoutLogo = await render(EmailLayout({ brand: { ...brand, logoUrl: null }, preview: "Hi", children: "Body" }));
+    expect(withoutLogo).not.toContain("<img");
+    expect(withoutLogo).toContain("Test Resort");
   });
 
   it("skips sending (without failing) when Resend isn't configured", async () => {

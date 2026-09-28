@@ -1,4 +1,5 @@
 import "server-only";
+import { isStoredAssetUrl } from "@/lib/brand-assets";
 import { normalizeHex, readableTextOn } from "@/lib/color";
 import { addDays, localDateOf, localMinuteOf, zonedToUtc } from "@/lib/dates";
 import { formatClock, formatLongDate, formatRange } from "@/lib/display";
@@ -38,6 +39,7 @@ function baseProps(b: BookingEmailRow, settings: BusinessSettings): BookingEmail
       brandColor,
       contact: [settings.contactPhone, settings.contactEmail].filter(Boolean).join(" or ") || null,
       address: settings.address,
+      logoUrl: isStoredAssetUrl(settings.logoUrl) ? settings.logoUrl : null,
     },
     brandText: readableTextOn(brandColor),
     customerName: b.customerName.split(" ")[0] ?? b.customerName,
