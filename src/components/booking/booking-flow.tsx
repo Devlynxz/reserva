@@ -133,7 +133,8 @@ export function BookingFlow({
       </div>
 
       {step < 3 && (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur">
+        // data-action-bar: the public footer leaves room for this bar while it's shown.
+        <div data-action-bar="" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             {step > 0 ? (
               <Button variant="ghost" onClick={() => goTo(step - 1)}>

@@ -223,8 +223,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Mobile: keep the main action in reach. The footer leaves room for it. */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 p-3 backdrop-blur sm:hidden">
+      {/* Mobile: keep the main action in reach. The footer leaves room for it (data-action-bar). */}
+      <div data-action-bar="mobile" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 p-3 backdrop-blur sm:hidden">
         <Link href="/book" className={buttonStyles({ size: "lg", className: "w-full" })}>
           Book now
         </Link>

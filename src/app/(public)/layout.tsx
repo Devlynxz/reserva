@@ -13,7 +13,7 @@ export default async function PublicLayout({ children }: { children: React.React
   const year = new Date().getFullYear();
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="group/page flex min-h-dvh flex-col">
       <header className="border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
           <Link href="/" className="flex min-w-0 items-center">
@@ -38,8 +38,9 @@ export default async function PublicLayout({ children }: { children: React.React
       </div>
 
       <footer className="border-t border-line bg-surface">
-        {/* Extra bottom room on phones: pages pin a full-width action bar there. */}
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-8 pb-28 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:pb-8">
+        {/* Room for a pinned action bar, only when the page shows one (data-action-bar;
+            "mobile" bars are hidden from sm up), so the footer is never covered. */}
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-8 pb-8 text-sm text-ink-muted group-has-[[data-action-bar]]/page:pb-28 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:group-has-[[data-action-bar=mobile]]/page:pb-8">
           <p>
             © {year} {name}
           </p>
