@@ -9,6 +9,7 @@ import {
   formatMonth,
   formatRange,
   formatShortDate,
+  formatTimeLeft,
 } from "../display";
 
 const MANILA = "Asia/Manila";
@@ -83,5 +84,20 @@ describe("formatRange", () => {
   it("spells out both dates for overnight ranges", () => {
     const range = formatRange(new Date("2030-04-05T11:00:00Z"), new Date("2030-04-05T23:00:00Z"), MANILA, L);
     expect(n(range)).toBe("Fri, Apr 5, 7:00 PM to Sat, Apr 6, 7:00 AM");
+  });
+});
+
+describe("formatTimeLeft", () => {
+  const end = Date.parse("2030-01-01T00:15:00.000Z");
+
+  it("shows minutes and zero-padded seconds, rounded to the nearest second", () => {
+    expect(formatTimeLeft(end, end - 15 * 60_000)).toBe("15:00");
+    expect(formatTimeLeft(end, end - 61_400)).toBe("1:01");
+    expect(formatTimeLeft(end, end - 9_600)).toBe("0:10");
+  });
+
+  it("stops at 0:00 once the hold has run out", () => {
+    expect(formatTimeLeft(end, end)).toBe("0:00");
+    expect(formatTimeLeft(end, end + 5_000)).toBe("0:00");
   });
 });

@@ -55,6 +55,12 @@ export function formatDuration(minutes: number): string {
   return m === 0 ? `${h} hr` : `${h} hr ${m} min`;
 }
 
+/** Countdown text for a hold ending at `endMs`: "14:05", never below "0:00". */
+export function formatTimeLeft(endMs: number, nowMs: number): string {
+  const left = Math.max(0, Math.round((endMs - nowMs) / 1000));
+  return `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+}
+
 /** How an offering's timing reads on a card: fixed window, or a duration. */
 export function describeSchedule(
   offering: { mode: "WINDOW" | "SLOT"; startMinute: number | null; endMinute: number | null; endsNextDay: boolean; durationMin: number | null },
