@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { ActionButton } from "@/components/admin/action-button";
-import { ActionForm, AdminCheckboxGroup, AdminField } from "@/components/admin/action-form";
+import { ActionForm, AdminCheckbox, AdminCheckboxGroup, AdminField } from "@/components/admin/action-form";
 import { Card, CardBody, CardHeader } from "@/components/ui";
-import { removeLogoAction, saveSettingsAction, uploadLogoAction } from "@/server/actions/admin/settings";
+import { isStoredAssetUrl } from "@/lib/brand-assets";
+import { removeIconAction, removeLogoAction, saveSettingsAction, uploadIconAction, uploadLogoAction } from "@/server/actions/admin/settings";
 import { blobEnabled } from "@/server/blob";
 import { getSettings } from "@/server/data/settings";
 import { env } from "@/server/env";
@@ -23,12 +24,16 @@ export default async function SettingsPage() {
         <p className="text-ink-muted">Changes apply to the website right away.</p>
       </div>
       <Card>
-        <CardHeader title="Logo" description="Shown in the site header instead of the business name. PNG, JPEG or WebP, up to 1 MB." />
+        <CardHeader title="Logo" description="Shown in the site and admin headers and at the top of emails. PNG, JPEG or WebP, up to 1 MB. A wide logo on a transparent background works best." />
         <CardBody className="space-y-4">
           {s.logoUrl && (
             <div className="flex flex-wrap items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size */}
-              <img src={s.logoUrl} alt="Current logo" className="h-12 w-auto rounded border border-line bg-surface p-1" />
+              {isStoredAssetUrl(s.logoUrl) ? (
+                // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size
+                <img src={s.logoUrl} alt="Current logo" className="h-12 w-auto rounded border border-line bg-surface p-1" />
+              ) : (
+                <p className="text-sm text-ink-muted">The saved logo isn&apos;t in this site&apos;s storage, so it isn&apos;t shown. Remove it and upload it again.</p>
+              )}
               <ActionButton action={removeLogoAction} label="Remove logo" />
             </div>
           )}
@@ -47,6 +52,42 @@ export default async function SettingsPage() {
             </ActionForm>
           ) : (
             <p className="text-sm text-ink-muted">To upload a logo, connect a Vercel Blob store to this project (Storage → Blob). It sets BLOB_READ_WRITE_TOKEN.</p>
+          )}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader
+          title="App icon"
+          description="The square icon for browser tabs, phone home screens and link previews. A PNG of exactly 512 × 512 pixels."
+        />
+        <CardBody className="space-y-4">
+          {s.iconUrl && (
+            <div className="flex flex-wrap items-center gap-4">
+              {isStoredAssetUrl(s.iconUrl) ? (
+                // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded icon
+                <img src={s.iconUrl} alt="Current app icon" width={48} height={48} className="size-12 rounded-control border border-line bg-surface" />
+              ) : (
+                <p className="text-sm text-ink-muted">The saved icon isn&apos;t in this site&apos;s storage, so it isn&apos;t shown. Remove it and upload it again.</p>
+              )}
+              <ActionButton action={removeIconAction} label="Remove icon" />
+            </div>
+          )}
+          {blobEnabled() ? (
+            <ActionForm action={uploadIconAction} submitLabel="Upload icon" submitVariant="secondary" resetOnSuccess>
+              <label className="block space-y-1.5">
+                <span className="text-sm font-semibold">Image file</span>
+                <input
+                  type="file"
+                  name="icon"
+                  accept="image/png"
+                  required
+                  className="block w-full text-sm file:mr-3 file:h-10 file:rounded-control file:border file:border-line-strong file:bg-surface file:px-3 file:font-semibold"
+                />
+              </label>
+            </ActionForm>
+          ) : (
+            <p className="text-sm text-ink-muted">To upload an icon, connect a Vercel Blob store to this project (Storage → Blob). It sets BLOB_READ_WRITE_TOKEN.</p>
           )}
         </CardBody>
       </Card>
@@ -109,6 +150,12 @@ export default async function SettingsPage() {
               hint="The question on one line, the answer below it. Leave a blank line between questions."
             />
             <AdminField name="policies" label="Booking policy" type="textarea" rows={4} defaultValue={s.policies} hint="Customers agree to this before paying." />
+            <AdminCheckbox
+              name="showPoweredBy"
+              label="Show “Powered by Reserva”"
+              hint="A small line in the site footer and on the staff sign-in page."
+              defaultChecked={s.showPoweredBy}
+            />
           </CardBody>
         </Card>
       </ActionForm>

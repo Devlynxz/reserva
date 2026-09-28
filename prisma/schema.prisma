@@ -325,6 +325,10 @@ model Settings {
   businessName   String   @map("business_name")
   tagline        String?
   logoUrl        String?  @map("logo_url")
+  /// Square 512 × 512 PNG on Vercel Blob: favicon, home-screen icon, share image.
+  iconUrl        String?  @map("icon_url")
+  /// Show "Powered by Reserva" in the public footer and on staff sign-in.
+  showPoweredBy  Boolean  @default(true) @map("show_powered_by")
   brandColor     String   @default("#0f766e") @map("brand_color")
   currency       String   @default("PHP") @db.Char(3)
   timezone       String   @default("Asia/Manila")

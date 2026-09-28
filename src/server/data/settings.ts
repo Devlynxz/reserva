@@ -17,6 +17,7 @@ export type BusinessSettings = {
   businessName: string;
   tagline: string | null;
   logoUrl: string | null;
+  iconUrl: string | null;
   brandColor: string;
   currency: string;
   timezone: string;
@@ -31,6 +32,7 @@ export type BusinessSettings = {
   mapUrl: string | null;
   policies: string | null;
   content: SiteContent;
+  showPoweredBy: boolean;
 };
 
 export async function getSettings(): Promise<BusinessSettings> {
@@ -40,6 +42,7 @@ export async function getSettings(): Promise<BusinessSettings> {
     businessName: row.businessName,
     tagline: row.tagline,
     logoUrl: row.logoUrl,
+    iconUrl: row.iconUrl,
     brandColor: row.brandColor,
     currency: row.currency,
     timezone: row.timezone,
@@ -54,6 +57,7 @@ export async function getSettings(): Promise<BusinessSettings> {
     mapUrl: row.mapUrl,
     policies: row.policies,
     content: contentSchema.catch({ amenities: [], faq: [] }).parse(row.content),
+    showPoweredBy: row.showPoweredBy,
   };
 }
 
@@ -84,6 +88,7 @@ export type SettingsUpdate = {
   mapUrl?: string;
   policies?: string;
   content: SiteContent;
+  showPoweredBy: boolean;
 };
 
 export async function updateSettings(input: SettingsUpdate): Promise<void> {
@@ -102,4 +107,8 @@ export async function updateSettings(input: SettingsUpdate): Promise<void> {
 
 export async function setLogoUrl(logoUrl: string | null): Promise<void> {
   await db.settings.update({ where: { id: 1 }, data: { logoUrl } });
+}
+
+export async function setIconUrl(iconUrl: string | null): Promise<void> {
+  await db.settings.update({ where: { id: 1 }, data: { iconUrl } });
 }

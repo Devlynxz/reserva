@@ -1,4 +1,5 @@
 import "server-only";
+import { isStoredAssetUrl } from "@/lib/brand-assets";
 import { normalizeHex, readableTextOn } from "@/lib/color";
 import { addDays, localDateOf, localMinuteOf, zonedToUtc } from "@/lib/dates";
 import { formatClock, formatLongDate, formatRange } from "@/lib/display";
@@ -13,6 +14,7 @@ import {
   BookingReceivedEmail,
   BookingReminderEmail,
 } from "./email/templates/booking-emails";
+import type { EmailBrand } from "./email/templates/layout";
 import { type SendResult, sendEmail } from "./email/send";
 import { appUrl } from "./app-url";
 import { env } from "./env";
@@ -29,17 +31,23 @@ export function bookingLink(referenceCode: string, bookingId: string): string {
   return `${appUrl()}/book/${referenceCode}?t=${deriveAccessToken(BETTER_AUTH_SECRET, bookingId)}`;
 }
 
+/** The business as emails show it. The logo is used only if it's our own stored file. */
+export function emailBrand(settings: BusinessSettings): EmailBrand {
+  return {
+    businessName: settings.businessName,
+    brandColor: normalizeHex(settings.brandColor) ?? reservaConfig.brand.color,
+    contact: [settings.contactPhone, settings.contactEmail].filter(Boolean).join(" or ") || null,
+    address: settings.address,
+    logoUrl: isStoredAssetUrl(settings.logoUrl) ? settings.logoUrl : null,
+  };
+}
+
 function baseProps(b: BookingEmailRow, settings: BusinessSettings): BookingEmailProps {
-  const brandColor = normalizeHex(settings.brandColor) ?? reservaConfig.brand.color;
+  const brand = emailBrand(settings);
   const where = b.resourceType === "STAFF" ? "With" : "Place";
   return {
-    brand: {
-      businessName: settings.businessName,
-      brandColor,
-      contact: [settings.contactPhone, settings.contactEmail].filter(Boolean).join(" or ") || null,
-      address: settings.address,
-    },
-    brandText: readableTextOn(brandColor),
+    brand,
+    brandText: readableTextOn(brand.brandColor),
     customerName: b.customerName.split(" ")[0] ?? b.customerName,
     referenceCode: b.referenceCode,
     details: [

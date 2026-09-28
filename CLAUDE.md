@@ -55,7 +55,7 @@ Full schema + hand-written SQL: `docs/PLAN.md` §2.
 - `Booking`: referenceCode (unique), accessTokenHash, resourceId, offeringId, startAt, endAt, occupiedUntil, span*, customerName/Email/Phone, guestCount, customerNotes, internalNotes, totalAmount, depositAmount, amountPaid, currency, priceBreakdown, status, source `ONLINE | WALK_IN | MESSAGE`, holdExpiresAt, paymentProvider, checkoutSessionId, reminderSentAt
 - `Payment`: bookingId, provider `PAYMONGO | STRIPE | MANUAL`, providerRef, providerEventId (unique per provider), amount, currency, method, status, raw (scrubbed), recordedById
 - `BookingEvent`: bookingId, fromStatus, toStatus, actorId?, note
-- `Settings` (singleton, CHECK id = 1) incl. holdMinutes, weekendDays, leadTimeMin, maxAdvanceDays, content (landing JSON)
+- `Settings` (singleton, CHECK id = 1) incl. holdMinutes, weekendDays, leadTimeMin, maxAdvanceDays, content (landing JSON), logoUrl + iconUrl (owner's brand on Vercel Blob; only Blob URLs are ever used), showPoweredBy
 - `RateLimit` (DB-backed fixed window)
 
 ## Structure

@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { isStoredAssetUrl } from "@/lib/brand-assets";
 import { normalizeHex, readableTextOn } from "@/lib/color";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
@@ -15,6 +16,9 @@ export default async function OpenGraphImage() {
   const line = settings?.tagline ?? reservaConfig.brand.tagline;
   const brand = normalizeHex(settings?.brandColor ?? "") ?? reservaConfig.brand.color;
   const onBrand = readableTextOn(brand);
+  // Only our own stored file: next/og fetches it server-side while rendering.
+  const iconUrl = settings?.iconUrl ?? null;
+  const icon = isStoredAssetUrl(iconUrl) ? iconUrl : null;
 
   // The brand kit's look: a harbour ground, white type, the client's color as the accent.
   return new ImageResponse(
@@ -32,7 +36,11 @@ export default async function OpenGraphImage() {
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          {icon && (
+            // eslint-disable-next-line @next/next/no-img-element -- rendered to PNG by next/og
+            <img src={icon} width={96} height={96} alt="" style={{ borderRadius: 20 }} />
+          )}
           <div
             style={{
               display: "flex",

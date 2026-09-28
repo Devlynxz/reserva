@@ -3,7 +3,7 @@ import { PaymentAmountError, recordManualPayment } from "@/server/data/admin-boo
 import { CatalogError, addHours, getOffering, saveOffering } from "@/server/data/admin-catalog";
 import { createBooking, sweepExpiredHolds } from "@/server/data/bookings";
 import { dashboardData, monthBounds, monthReport } from "@/server/data/reports";
-import { getSettings, updateSettings } from "@/server/data/settings";
+import { getSettings, setIconUrl, updateSettings } from "@/server/data/settings";
 import { TeamError, createTeamMember, setTeamMemberDisabled, setTeamMemberRole } from "@/server/data/team";
 import {
   NOW,
@@ -184,5 +184,19 @@ describeDb("admin data", () => {
       tagline: null,
       content: { hero: { headline: "Hello", subhead: "World" }, amenities: ["Pool"], faq: [{ question: "Q?", answer: "A." }] },
     });
+  });
+
+  it("stores the app icon and the 'Powered by' switch", async () => {
+    expect(await getSettings()).toMatchObject({ iconUrl: null, showPoweredBy: true });
+
+    const icon = "https://abc123.public.blob.vercel-storage.com/icons/icon-1.png";
+    await setIconUrl(icon);
+    // Optional text comes back as null but is written as undefined; this test doesn't touch it.
+    const { tagline: _t, contactEmail: _e, contactPhone: _p, address: _a, mapUrl: _m, policies: _po, ...rest } = await getSettings();
+    await updateSettings({ ...rest, showPoweredBy: false });
+    expect(await getSettings()).toMatchObject({ iconUrl: icon, showPoweredBy: false });
+
+    await setIconUrl(null);
+    expect((await getSettings()).iconUrl).toBeNull();
   });
 });

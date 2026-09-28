@@ -1,7 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { put } from "@vercel/blob";
-import { detectImageType } from "@/lib/image-type";
+import { checkAppIcon, detectImageType } from "@/lib/image-type";
 import { env } from "./env";
 
 // Vercel Blob storage for admin-uploaded images. Optional: without BLOB_READ_WRITE_TOKEN
@@ -17,8 +17,8 @@ export function blobEnabled(): boolean {
   return Boolean(env().BLOB_READ_WRITE_TOKEN);
 }
 
-/** Validates (size, real image type) and stores a logo; returns its public URL. */
-export async function uploadLogo(file: File): Promise<string> {
+/** Validates (size, real image type, optional extra check) and stores an image; returns its public URL. */
+async function storeImage(file: File, folder: "logos" | "icons", check?: (bytes: Uint8Array) => string | null): Promise<string> {
   const token = env().BLOB_READ_WRITE_TOKEN;
   if (!token) throw new UploadError("Photo storage isn't connected. Add a Vercel Blob store first.");
   if (file.size === 0) throw new UploadError("Choose an image file.");
@@ -27,12 +27,24 @@ export async function uploadLogo(file: File): Promise<string> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const type = detectImageType(bytes);
   if (!type) throw new UploadError("Use a PNG, JPEG or WebP image.");
+  const problem = check?.(bytes);
+  if (problem) throw new UploadError(problem);
 
   // Random, unguessable name; the extension and content type come from the bytes, not the upload.
-  const blob = await put(`logos/logo-${randomBytes(8).toString("hex")}.${type.ext}`, Buffer.from(bytes), {
+  const name = folder === "logos" ? "logo" : "icon";
+  const blob = await put(`${folder}/${name}-${randomBytes(8).toString("hex")}.${type.ext}`, Buffer.from(bytes), {
     access: "public",
     contentType: type.mime,
     token,
   });
   return blob.url;
+}
+
+export function uploadLogo(file: File): Promise<string> {
+  return storeImage(file, "logos");
+}
+
+/** The app icon must be a 512 × 512 PNG (see checkAppIcon). */
+export function uploadIcon(file: File): Promise<string> {
+  return storeImage(file, "icons", checkAppIcon);
 }

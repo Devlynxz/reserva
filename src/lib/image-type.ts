@@ -14,3 +14,25 @@ export function detectImageType(bytes: Uint8Array): ImageType | null {
   if (startsWith(bytes, [0x52, 0x49, 0x46, 0x46]) && startsWith(bytes, [0x57, 0x45, 0x42, 0x50], 8)) return { ext: "webp", mime: "image/webp" };
   return null;
 }
+
+/** Pixel size of a PNG, read from its IHDR chunk (always the first chunk). */
+export function pngSize(bytes: Uint8Array): { width: number; height: number } | null {
+  if (detectImageType(bytes)?.ext !== "png" || bytes.length < 24) return null;
+  // Layout after the 8-byte signature: length(4) "IHDR"(4) width(4) height(4), big-endian.
+  if (!startsWith(bytes, [0x49, 0x48, 0x44, 0x52], 12)) return null;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  return { width: view.getUint32(16), height: view.getUint32(20) };
+}
+
+/** Favicons, home-screen icons and the share image all derive from one square PNG. */
+export const APP_ICON_SIZE = 512;
+
+/** null when the bytes are a usable app icon; otherwise what to tell the owner. */
+export function checkAppIcon(bytes: Uint8Array): string | null {
+  const size = pngSize(bytes);
+  if (!size) return "Use a PNG image for the app icon.";
+  if (size.width !== APP_ICON_SIZE || size.height !== APP_ICON_SIZE) {
+    return `Use a square PNG of exactly ${APP_ICON_SIZE} × ${APP_ICON_SIZE} pixels (this one is ${size.width} × ${size.height}).`;
+  }
+  return null;
+}

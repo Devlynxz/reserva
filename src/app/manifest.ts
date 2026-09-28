@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { siteIcons } from "@/lib/brand-assets";
+import { normalizeHex } from "@/lib/color";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
 
@@ -16,11 +18,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#02272d",
-    icons: [
-      { src: "/brand/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/brand/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-      { src: "/brand/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-    ],
+    theme_color: normalizeHex(settings?.brandColor ?? "") ?? reservaConfig.brand.color,
+    icons: siteIcons(settings?.iconUrl ?? null).manifest,
   };
 }

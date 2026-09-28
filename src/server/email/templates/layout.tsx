@@ -1,4 +1,4 @@
-import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components";
+import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from "@react-email/components";
 import type { ReactNode } from "react";
 
 // Shared frame for every customer email: the business's brand color as a thin top rule,
@@ -9,6 +9,8 @@ export type EmailBrand = {
   brandColor: string;
   contact: string | null;
   address: string | null;
+  /** Only a trusted (our Blob store) URL, or null — see isStoredAssetUrl. */
+  logoUrl: string | null;
 };
 
 export const text = { color: "#02272d", fontSize: "15px", lineHeight: "24px", margin: "0 0 12px" } as const;
@@ -23,7 +25,11 @@ export function EmailLayout({ brand, preview, children }: { brand: EmailBrand; p
         <Container style={{ backgroundColor: "#ffffff", border: "1px solid #d7e3df", borderRadius: "20px", maxWidth: "560px", overflow: "hidden" }}>
           <Section style={{ backgroundColor: brand.brandColor, height: "6px" }} />
           <Section style={{ padding: "28px 32px 8px" }}>
-            <Text style={{ ...muted, fontWeight: 600, margin: "0 0 20px" }}>{brand.businessName}</Text>
+            {brand.logoUrl ? (
+              <Img src={brand.logoUrl} alt={brand.businessName} height="40" style={{ display: "block", height: "40px", margin: "0 0 20px", maxWidth: "220px", width: "auto" }} />
+            ) : (
+              <Text style={{ ...muted, fontWeight: 600, margin: "0 0 20px" }}>{brand.businessName}</Text>
+            )}
             {children}
           </Section>
           <Hr style={{ borderColor: "#d7e3df", margin: "8px 0 0" }} />
