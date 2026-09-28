@@ -9,7 +9,6 @@
 // history is checked against lib/booking-status.
 
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { hashPassword } from "better-auth/crypto";
 import { config } from "dotenv";
 import { type BlockSpan, type BusySpan, isResourceFree } from "@/lib/availability";
@@ -22,7 +21,8 @@ import { generateReferenceCode } from "@/lib/reference-code";
 import { type HoursRow, hoursFor, slotGrid, slotSpan } from "@/lib/slots";
 import { windowSpan } from "@/lib/windows";
 import { deriveAccessToken, hashAccessToken } from "../src/server/tokens";
-import { PrismaClient } from "../src/generated/prisma/client";
+import type { PrismaClient } from "../src/generated/prisma/client";
+import { createPrismaClient } from "../src/server/data/client";
 import { court } from "./seeds/court";
 import { resort } from "./seeds/resort";
 import { salon } from "./seeds/salon";
@@ -196,7 +196,7 @@ async function main() {
   const connectionString = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
   if (!connectionString) throw new Error("Set DATABASE_URL (and ideally DATABASE_URL_UNPOOLED).");
 
-  const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  const db = createPrismaClient(connectionString);
   try {
     const { settings } = preset;
     const tz = settings.timezone;

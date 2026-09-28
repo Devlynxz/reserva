@@ -56,6 +56,8 @@ Never set on Vercel: `TEST_DATABASE_URL` (tests truncate it) and the `SEED_*` va
 - [ ] Check Settings → Environment Variables: `DATABASE_URL` and `DATABASE_URL_UNPOOLED` now exist.
 - [ ] Settings → Functions → **Function Region**: the same region as the database (Singapore, `sin1`). Every query crosses this gap.
 
+The app runs every database session in UTC (`src/server/data/client.ts`), whatever the server's default, because the Prisma `pg` adapter assumes UTC; the business's own time zone lives in Settings. Neon already defaults to UTC. If you ever point Reserva at a Postgres whose default isn't UTC (`SHOW timezone`), data written before this setting existed is shifted by that offset: reseed a demo database rather than trusting old times.
+
 ### 3. Required variables
 - [ ] `BETTER_AUTH_SECRET` — Production (and a *different* one for Preview).
 - [ ] `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL` — `https://reserva-villaserena.vercel.app` for Production.
