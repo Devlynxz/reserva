@@ -272,6 +272,13 @@ describe("settingsInputSchema", () => {
     expect(settingsInputSchema.parse(settings)).toMatchObject({ weekendDays: [5, 6], holdMinutes: 15 });
   });
 
+  it("defaults 'Powered by' on and keeps an explicit false from the form", () => {
+    expect(settingsInputSchema.parse(settings).showPoweredBy).toBe(true);
+    // formObject(formData, { booleans: ["showPoweredBy"] }) turns an unticked box into false.
+    expect(settingsInputSchema.parse({ ...settings, showPoweredBy: false }).showPoweredBy).toBe(false);
+    expect(settingsInputSchema.safeParse({ ...settings, showPoweredBy: "yes" }).success).toBe(false);
+  });
+
   it.each(["0", "100.5", "abc"])("rejects a deposit of %s", (depositPercent) => {
     expect(settingsInputSchema.safeParse({ ...settings, depositPercent }).success).toBe(false);
   });

@@ -237,6 +237,7 @@ export const settingsInputSchema = z.object({
   contactPhone: phoneSchema.optional(),
   address: optionalText(300),
   policies: optionalText(10_000),
+  showPoweredBy: z.boolean().default(true),
 });
 
 /** Walk-in / message booking entered by staff. Same engine, different entry point. */
