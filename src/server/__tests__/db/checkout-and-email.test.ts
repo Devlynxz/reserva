@@ -6,7 +6,8 @@ import { createBooking, transitionBooking } from "@/server/data/bookings";
 import { BookingConfirmedEmail } from "@/server/email/templates/booking-emails";
 import { EmailLayout } from "@/server/email/templates/layout";
 import { resetEnvCache } from "@/server/env";
-import { bookingLink, notifyBookingConfirmed, notifyBookingReceived, sendDueReminders } from "@/server/notifications";
+import { getSettings } from "@/server/data/settings";
+import { bookingLink, emailBrand, notifyBookingConfirmed, notifyBookingReceived, sendDueReminders } from "@/server/notifications";
 import { TZ, createResource, createSlotOffering, customer, db, describeDb, openEveryDay, resetDb, seedSettings } from "@/test/db";
 
 // Checkout uses the real clock (holds must be open "now"), so these bookings are made now.
@@ -150,6 +151,16 @@ describeDb("emails", () => {
     const withoutLogo = await render(EmailLayout({ brand: { ...brand, logoUrl: null }, preview: "Hi", children: "Body" }));
     expect(withoutLogo).not.toContain("<img");
     expect(withoutLogo).toContain("Test Resort");
+  });
+
+  it("only puts the business's own stored logo in emails", async () => {
+    await setup();
+    const settings = await getSettings();
+    // A legacy or hand-edited value must never reach an email client.
+    expect(emailBrand({ ...settings, logoUrl: "https://evil.example/x.png" }).logoUrl).toBeNull();
+    expect(emailBrand({ ...settings, logoUrl: "http://abc123.public.blob.vercel-storage.com/logos/logo-1.png" }).logoUrl).toBeNull();
+    const logo = "https://abc123.public.blob.vercel-storage.com/logos/logo-1.png";
+    expect(emailBrand({ ...settings, logoUrl: logo })).toMatchObject({ businessName: "Test Resort", logoUrl: logo });
   });
 
   it("skips sending (without failing) when Resend isn't configured", async () => {
