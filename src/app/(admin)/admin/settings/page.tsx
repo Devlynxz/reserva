@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ActionButton } from "@/components/admin/action-button";
 import { ActionForm, AdminCheckbox, AdminCheckboxGroup, AdminField } from "@/components/admin/action-form";
 import { Card, CardBody, CardHeader } from "@/components/ui";
+import { isStoredAssetUrl } from "@/lib/brand-assets";
 import { removeIconAction, removeLogoAction, saveSettingsAction, uploadIconAction, uploadLogoAction } from "@/server/actions/admin/settings";
 import { blobEnabled } from "@/server/blob";
 import { getSettings } from "@/server/data/settings";
@@ -27,8 +28,12 @@ export default async function SettingsPage() {
         <CardBody className="space-y-4">
           {s.logoUrl && (
             <div className="flex flex-wrap items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size */}
-              <img src={s.logoUrl} alt="Current logo" className="h-12 w-auto rounded border border-line bg-surface p-1" />
+              {isStoredAssetUrl(s.logoUrl) ? (
+                // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size
+                <img src={s.logoUrl} alt="Current logo" className="h-12 w-auto rounded border border-line bg-surface p-1" />
+              ) : (
+                <p className="text-sm text-ink-muted">The saved logo isn&apos;t in this site&apos;s storage, so it isn&apos;t shown. Remove it and upload it again.</p>
+              )}
               <ActionButton action={removeLogoAction} label="Remove logo" />
             </div>
           )}
@@ -59,8 +64,12 @@ export default async function SettingsPage() {
         <CardBody className="space-y-4">
           {s.iconUrl && (
             <div className="flex flex-wrap items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element -- admin-uploaded icon */}
-              <img src={s.iconUrl} alt="Current app icon" width={48} height={48} className="size-12 rounded-control border border-line bg-surface" />
+              {isStoredAssetUrl(s.iconUrl) ? (
+                // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded icon
+                <img src={s.iconUrl} alt="Current app icon" width={48} height={48} className="size-12 rounded-control border border-line bg-surface" />
+              ) : (
+                <p className="text-sm text-ink-muted">The saved icon isn&apos;t in this site&apos;s storage, so it isn&apos;t shown. Remove it and upload it again.</p>
+              )}
               <ActionButton action={removeIconAction} label="Remove icon" />
             </div>
           )}

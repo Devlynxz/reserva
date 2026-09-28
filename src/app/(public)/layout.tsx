@@ -1,25 +1,23 @@
 import Link from "next/link";
+import { BusinessBrand } from "@/components/brand/business-brand";
 import { PoweredByReserva } from "@/components/brand/reserva-logo";
 import { buttonStyles } from "@/components/ui";
+import { brandMark } from "@/lib/brand-assets";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettingsOrNull();
   const name = settings?.businessName ?? reservaConfig.brand.name;
+  const mark = brandMark({ businessName: name, logoUrl: settings?.logoUrl ?? null, iconUrl: settings?.iconUrl ?? null });
   const year = new Date().getFullYear();
 
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
-          <Link href="/" className="min-w-0 truncate font-heading text-lg font-bold tracking-tight sm:text-xl">
-            {settings?.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded logo of unknown size
-              <img src={settings.logoUrl} alt={name} className="h-8 w-auto" />
-            ) : (
-              name
-            )}
+          <Link href="/" className="flex min-w-0 items-center">
+            <BusinessBrand mark={mark} />
           </Link>
           <nav aria-label="Main" className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link href="/lookup" className={buttonStyles({ variant: "ghost", size: "sm" })}>
@@ -49,7 +47,7 @@ export default async function PublicLayout({ children }: { children: React.React
             <Link href="/sign-in" className="underline-offset-4 hover:text-ink hover:underline">
               Staff sign in
             </Link>
-            <PoweredByReserva />
+            {(settings?.showPoweredBy ?? true) && <PoweredByReserva />}
           </div>
         </div>
       </footer>
