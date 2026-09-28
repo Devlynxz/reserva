@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Figtree, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { DemoBanner } from "@/components/demo-banner";
+import { siteIcons } from "@/lib/brand-assets";
 import { brandCssVars } from "@/lib/color";
 import { getSettingsOrNull } from "@/server/data/settings";
 import { reservaConfig } from "@reserva/config";
@@ -13,6 +14,7 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: 
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettingsOrNull();
+  const icons = siteIcons(settings?.iconUrl ?? null);
   const name = settings?.businessName ?? reservaConfig.brand.name;
   const description = settings?.content.hero?.subhead ?? settings?.tagline ?? reservaConfig.brand.description;
   return {
@@ -22,15 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: name,
     openGraph: { type: "website", siteName: name, title: name, description, locale: reservaConfig.locale.replace("-", "_") },
     twitter: { card: "summary_large_image", title: name, description },
-    // The Reserva mark by default; a client swaps the files in public/brand/icons.
-    icons: {
-      icon: [
-        { url: "/brand/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
-        { url: "/brand/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
-        { url: "/brand/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
-      ],
-      apple: { url: "/brand/icons/apple-touch-icon.png", sizes: "180x180" },
-    },
+    // The owner's app icon once uploaded; the Reserva kit icons until then.
+    icons: { icon: icons.icon, apple: icons.apple },
   };
 }
 
